@@ -7,6 +7,31 @@ behind each change can be found later.
 
 ## Unreleased (4.5.0)
 
+### Fixed
+
+#### Streaming reader dropped archive entries (upstream exceljs#1328)
+
+`WorkbookReader` returned unresolved `{sharedString: N}` references instead of
+cell values when a workbook stored its worksheet before `sharedStrings.xml` —
+the layout produced by several spreadsheet applications.
+
+Root cause was not in the reader but in `lib/utils/iterate-stream.js`, which
+paused the stream around each `yield`. Sources like unzipper's entry stream keep
+working while paused and emit `end` once their input is exhausted, so any entry
+not yet delivered was dropped silently. The reader's own workaround — writing
+the early worksheet to a temp file — was itself the delay that triggered the
+loss, so the mechanism meant to fix the ordering caused the bug.
+
+The failure is timing-dependent, which is why it reproduced on macOS and Windows
+but not on Linux, where the write usually won the race. A 5 ms delay in the
+consumer was enough to reproduce it anywhere.
+
+Fix: do not pause the stream around the yield. Verified with the existing
+`spec/integration/issues/issue-1328-xlsx-worksheet-reader-date.spec.js`, red
+before and green after. Two further integration failures in the same area
+disappeared with it. Peak heap over a 200,000-row read was unchanged
+(82 MB before, 80 MB after).
+
 ### Project
 
 - Renamed the package to `exceljs-community` and pointed repository metadata at
