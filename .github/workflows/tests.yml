@@ -95,9 +95,10 @@ jobs:
             v1-npm-
       - run: npm install
       - run: npm install typescript
-      # --ignoreConfig: TypeScript 5.x errors with TS5112 when files are given
-      # on the command line while a tsconfig.json exists.
-      - run: npx tsc --ignoreConfig index.d.ts
+      # Compile through tsconfig.json rather than naming files on the command
+      # line: TypeScript 5.x rejects that combination with TS5112, and going
+      # through the project file works on every version.
+      - run: npx tsc -p tsconfig.json --noEmit
         env:
           CI: true
       - run: npm run test:typescript
