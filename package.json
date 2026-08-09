@@ -145,7 +145,7 @@
     "prettier-eslint-cli": "^5.0.0",
     "regenerator-runtime": "^0.13.7",
     "sax": "^1.2.4",
-    "terser": "^4.8.1",
+    "terser": "^5.49.2",
     "ts-node": "^8.10.2",
     "typescript": "^3.9.7"
   }
