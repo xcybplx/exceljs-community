@@ -5,6 +5,35 @@ pull request that reported or diagnosed it. Fixes are implemented independently;
 this file exists so credit for the diagnosis is not lost, and so the reasoning
 behind each change can be found later.
 
+## 4.6.0
+
+### Added
+
+#### Named exports, and the mismatch that hid the lack of them
+
+`index.d.ts` declared `Workbook` and 105 other named exports; the package
+delivered none. The CommonJS entry builds its export object at runtime with
+`Object.assign`, so `cjs-module-lexer` — the static analyser Node uses to offer
+named exports from CommonJS — found nothing, and an ES module importing the
+package received a namespace of `default` and `module.exports` alone.
+
+Every layer was individually defensible and the combination was not: the types
+promised, the runtime did not deliver, and no test could see the gap because the
+suite loads files by path and never resolves the package by name.
+
+`index.mjs` now states the exports outright. `package.json` gained an `exports`
+map so that entry is used for `import` while `require` keeps reaching
+`excel.js`, and `index.d.ts` gained the default export it had never declared
+plus `ModelContainer`, exported since long before this fork and never described.
+
+Verified against a packed tarball rather than the working tree: the same import
+statement type-checks under `module: node16` and runs. Before, those two were
+mutually exclusive.
+
+`spec/end-to-end/module-exports.spec.js` covers the four ways in and asserts
+that the hand-written list in `index.mjs` matches the CommonJS entry exactly, so
+it cannot drift unnoticed.
+
 ## 4.5.1
 
 No change to library behaviour. Corrects the description of `exceljs#1328` in

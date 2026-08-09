@@ -10,6 +10,37 @@ who reported and diagnosed each problem upstream.
 Every release is a drop-in replacement for `exceljs@4.4.0` unless an entry says
 otherwise in as many words.
 
+## 4.6.0 — 2026-08-09
+
+### Added
+
+- **Named imports.** `import {Workbook, ValueType} from 'exceljs-community'`
+  now works, in Node and in every bundler, alongside the default import and
+  `require`.
+
+  It did not before, and the way it failed was the problem. `index.d.ts` has
+  always declared `Workbook` and 105 other named exports, so TypeScript accepted
+  the import. The package delivered none of them: the CommonJS entry assembles
+  its exports at runtime with `Object.assign`, which Node's static analyser
+  cannot read, so `await import('exceljs-community')` yielded a namespace of
+  exactly `default` and `module.exports`. Type-checking passed, the build
+  produced `undefined`, and nothing in between said a word.
+
+  The fix is an ES module entry that states its exports rather than leaving them
+  to be inferred, reached through a new `exports` map. `index.d.ts` also gains
+  the default export it never declared, and `ModelContainer`, which the package
+  has always exported and the declarations never mentioned.
+
+### Compatibility
+
+An `exports` map restricts a package to the paths it lists, so the documented
+ways in were mapped deliberately and each has a test: `require` and `import` of
+the package, deep paths under `lib/` with and without the `.js` extension, and
+`dist/es5`, which `docs/api.md` documents for older Node versions.
+
+If you reach for a path inside this package that is not covered, that is a bug
+here — please report it.
+
 ## 4.5.1 — 2026-08-09
 
 **Not a security release, and nothing in the library changed.** This exists to

@@ -2038,3 +2038,27 @@ export namespace stream {
 		}
 	}
 }
+
+export class ModelContainer {
+	constructor(model: any);
+	model: any;
+	readonly xlsx: Xlsx;
+}
+
+// The shape of the runtime object, for `import ExcelJS from 'exceljs-community'`
+// and for `require`. Until 4.6.0 this file declared the named exports and no
+// default, while the package delivered a default and no named exports — the two
+// halves of one mismatch, each invisible from the other side.
+declare const ExcelJS: {
+	Workbook: typeof Workbook;
+	ModelContainer: typeof ModelContainer;
+	stream: typeof stream;
+	ValueType: typeof ValueType;
+	FormulaType: typeof FormulaType;
+	RelationshipType: typeof RelationshipType;
+	DocumentType: typeof DocumentType;
+	ReadingOrder: typeof ReadingOrder;
+	ErrorValue: typeof ErrorValue;
+};
+
+export default ExcelJS;

@@ -50,14 +50,22 @@ The public API is identical to `exceljs@4.4.0`. Migration is one line in
 
 ```diff
 - "exceljs": "^4.4.0"
-+ "exceljs-community": "^4.5.0"
++ "exceljs-community": "^4.6.0"
 ```
 
 ```js
 const ExcelJS = require('exceljs-community');
 // or
 import ExcelJS from 'exceljs-community';
+// or, since 4.6.0
+import {Workbook, ValueType} from 'exceljs-community';
 ```
+
+Named imports are new in 4.6.0. Before it, `index.d.ts` declared them and the
+package did not deliver them, so TypeScript accepted `import {Workbook}` and the
+built application got `undefined` — a mismatch that only appeared once bundled.
+Deep imports such as `exceljs-community/lib/doc/workbook` and the documented
+`exceljs-community/dist/es5` path keep working unchanged.
 
 Breaking changes are not planned for the 4.x line.
 

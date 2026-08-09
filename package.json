@@ -1,6 +1,6 @@
 {
   "name": "exceljs-community",
-  "version": "4.5.1",
+  "version": "4.6.0",
   "description": "Excel Workbook Manager - Read and Write xlsx and csv Files. Maintained drop-in replacement for exceljs.",
   "private": false,
   "license": "MIT",
@@ -22,6 +22,27 @@
   "main": "./excel.js",
   "browser": "./dist/exceljs.min.js",
   "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "browser": "./dist/exceljs.min.js",
+      "import": "./index.mjs",
+      "require": "./excel.js",
+      "default": "./excel.js"
+    },
+    "./excel.js": "./excel.js",
+    "./dist/es5": "./dist/es5/index.js",
+    "./dist/es5/*.js": "./dist/es5/*.js",
+    "./dist/es5/*": "./dist/es5/*.js",
+    "./dist/*": "./dist/*",
+    "./lib/*.js": "./lib/*.js",
+    "./lib/*.json": "./lib/*.json",
+    "./lib/*": "./lib/*.js",
+    "./index.d.ts": "./index.d.ts",
+    "./index.ts": "./index.ts",
+    "./index.mjs": "./index.mjs",
+    "./package.json": "./package.json"
+  },
   "files": [
     "dist",
     "lib",
@@ -32,6 +53,7 @@
     "FORK.md",
     "docs",
     "index.ts",
+    "index.mjs",
     "index.d.ts"
   ],
   "scripts": {
