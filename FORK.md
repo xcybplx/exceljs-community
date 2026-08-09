@@ -32,6 +32,25 @@ before and green after. Two further integration failures in the same area
 disappeared with it. Peak heap over a 200,000-row read was unchanged
 (82 MB before, 80 MB after).
 
+### Changed
+
+#### uuid is no longer a dependency
+
+The library asked `uuid` for one thing: a version 4 value for the `x14Id`
+attribute of a conditional formatting extension, requested with no arguments.
+That identifier has to be unique inside a workbook; it is not a security token.
+
+`uuid@8` carries GHSA-w5hq-g745-h8pq, which cannot be reached from here — it
+requires a caller-supplied buffer — but it surfaced in every consumer audit.
+Upgrading was not available either: from 11.1.1 onwards `uuid` ships ES2021
+syntax that the browser build cannot process, and 12.0.0 drops CommonJS.
+
+`lib/utils/uuid.js` now generates the value directly, preferring
+`crypto.randomUUID` and otherwise assembling it from 16 random bytes per
+RFC 4122. Generated identifiers keep the same shape, so files are unchanged.
+`npm audit --omit=dev` is clean and the production dependency count drops from
+eight to seven.
+
 ### Project
 
 - Renamed the package to `exceljs-community` and pointed repository metadata at
@@ -40,8 +59,10 @@ disappeared with it. Peak heap over a 200,000-row read was unchanged
 - Split the 205 KB README: the API reference moved to `docs/api.md`, the upstream
   changelog to `docs/history-upstream.md`. The new README covers what the project
   is and what is promised of it.
-
-No library behaviour has changed yet.
+- `grunt build` now fails when minification fails. `grunt-terser` logged the
+  error and carried on, leaving the previous `dist/*.min.js` in place and the
+  build green — and `package.json` points browser consumers at that file. The
+  gruntfile drives `terser` itself now, on version 5.
 
 ## Not planned for 4.5.0
 
