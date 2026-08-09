@@ -9,7 +9,13 @@ behind each change can be found later.
 
 ### Fixed
 
-#### Streaming reader dropped archive entries (upstream exceljs#1328)
+#### Streaming reader dropped archive entries
+
+Caught by the regression test added in
+[exceljs#1328](https://github.com/exceljs/exceljs/pull/1328) (merged 2020). That
+pull request fixed a different fault and left the test behind; the test then
+passed on Linux, which is what upstream CI ran, and failed on macOS and Windows
+for the next six years without anyone seeing it.
 
 `WorkbookReader` returned unresolved `{sharedString: N}` references instead of
 cell values when a workbook stored its worksheet before `sharedStrings.xml` —

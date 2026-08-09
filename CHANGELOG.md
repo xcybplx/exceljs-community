@@ -30,10 +30,11 @@ a matter of changing the dependency name.
   failure was timing-dependent, which is why it appeared on macOS and Windows
   far more often than on Linux.
 
-  Reported upstream as
-  [exceljs#1328](https://github.com/exceljs/exceljs/issues/1328), open since
-  2020. Two further reader failures in the same area turned out to share this
-  cause and are fixed with it.
+  The regression test that catches it has been in the repository since 2020,
+  added by [exceljs#1328](https://github.com/exceljs/exceljs/pull/1328). It
+  passed on Linux, which is what upstream CI ran, and had been failing on macOS
+  and Windows ever since. Two further reader failures in the same area turned
+  out to share this cause and are fixed with it.
 
 ### Changed
 
