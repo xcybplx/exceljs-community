@@ -1,17 +1,21 @@
 ---
-name: 💬 Questions / Help
-title: '[Q] PLEASE USE DISCUSSIONS'
-label: ':speech_balloon: Question'
-about: https://github.com/exceljs/exceljs/discussions/categories/q-a 
+name: 💬 Question
+title: '[Q] '
+label: 'question'
+about: Ask how to do something with this library
 ---
 
-## 💬 Questions and Help
+## What are you trying to do?
 
-Please do not use issues for making a questions, for this purposes much better is GitHub Discussions feature:
-https://github.com/exceljs/exceljs/discussions/categories/q-a
+Describe the outcome you want, not only the code that is not working.
 
-### How to make a question?
+## What have you tried?
 
-1. First, try to find it by using search bar - anware what are you looking for was be done before.
-2. Push the `New discussion` button.
-3. Select `Q&A` category.
+Include the smallest piece of code that shows the problem, and the version of
+`exceljs-community` you are on.
+
+---
+
+Before opening this, please search the existing issues — and the [upstream
+exceljs issues](https://github.com/exceljs/exceljs/issues), which cover eleven
+years of questions and are still the best archive of answers for this API.

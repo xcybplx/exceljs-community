@@ -68,7 +68,13 @@ upstream and **has not yet been verified** against the current code — sections
 are reviewed as the areas they describe are worked on. If something there
 contradicts what you observe, that is worth an issue.
 
-The upstream changelog up to 4.4.0 is archived in
+[docs/model.md](docs/model.md) describes the plain object model behind a
+workbook, which is worth reading before manipulating one directly.
+[docs/upgrade-4.0.md](docs/upgrade-4.0.md) is the migration guide from the 3.x
+line, still accurate for anyone arriving from an old version.
+
+Changes made here are listed in [CHANGELOG.md](CHANGELOG.md); the upstream
+changelog up to 4.4.0 is archived in
 [docs/history-upstream.md](docs/history-upstream.md).
 
 ## Contributing
