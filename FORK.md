@@ -5,7 +5,7 @@ pull request that reported or diagnosed it. Fixes are implemented independently;
 this file exists so credit for the diagnosis is not lost, and so the reasoning
 behind each change can be found later.
 
-## Unreleased (4.5.0)
+## 4.5.0
 
 ### Fixed
 

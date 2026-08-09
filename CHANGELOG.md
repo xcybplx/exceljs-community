@@ -10,7 +10,7 @@ who reported and diagnosed each problem upstream.
 Every release is a drop-in replacement for `exceljs@4.4.0` unless an entry says
 otherwise in as many words.
 
-## Unreleased (4.5.0)
+## 4.5.0 — 2026-08-09
 
 The first release under the new name. The API, the module shape and the
 supported Node versions are unchanged from `exceljs@4.4.0`; switching should be
