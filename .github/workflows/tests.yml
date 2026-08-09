@@ -3,8 +3,18 @@ name: Tests
 on:
   push:
     branches: [ master ]
+    # Documentation-only commits cannot change test results, and the matrix is
+    # twelve jobs wide.
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
   pull_request:
     branches: [ '**' ]
+
+# A newer push to the same branch supersedes whatever is still running for it.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
