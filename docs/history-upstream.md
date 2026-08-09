@@ -2,7 +2,8 @@
 
 > Archived from the original exceljs README. Preserved to credit the
 > hundreds of contributors whose work this package builds on.
-> Releases from 4.5.0 onward are documented in GitHub Releases.
+> Releases from 4.5.0 onward are documented in
+> [CHANGELOG.md](../CHANGELOG.md).
 
 # Release History[⬆](#contents)<!-- Link generated with jump2header -->
 

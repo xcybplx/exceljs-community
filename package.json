@@ -28,6 +28,8 @@
     "excel.js",
     "LICENSE",
     "README.md",
+    "CHANGELOG.md",
+    "FORK.md",
     "docs",
     "index.ts",
     "index.d.ts"

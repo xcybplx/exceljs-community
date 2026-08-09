@@ -7,7 +7,9 @@ has received no commits since January 2024 and no release since 4.4.0 in October
 2023. This package picks up where 4.4.0 left off, as a drop-in replacement.
 
 > **Status: pre-release.** Version 4.5.0 has not been published yet. The code
-> here is exceljs 4.4.0 plus the changes listed in [FORK.md](FORK.md). Watch
+> here is exceljs 4.4.0 plus the changes listed in
+> [CHANGELOG.md](CHANGELOG.md), with the reasoning behind each in
+> [FORK.md](FORK.md). Watch
 > [Releases](https://github.com/xcybplx/exceljs-community/releases) for the first
 > published version.
 
