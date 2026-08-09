@@ -5,6 +5,12 @@ pull request that reported or diagnosed it. Fixes are implemented independently;
 this file exists so credit for the diagnosis is not lost, and so the reasoning
 behind each change can be found later.
 
+## 4.5.1
+
+No change to library behaviour. Corrects the description of `exceljs#1328` in
+the 4.5.0 notes, and moves the `got` devDependency to 11.8.5 — a test-only
+dependency that never reaches anyone installing this package.
+
 ## 4.5.0
 
 ### Fixed

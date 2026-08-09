@@ -10,6 +10,27 @@ who reported and diagnosed each problem upstream.
 Every release is a drop-in replacement for `exceljs@4.4.0` unless an entry says
 otherwise in as many words.
 
+## 4.5.1 — 2026-08-09
+
+**Not a security release, and nothing in the library changed.** This exists to
+correct the 4.5.0 notes, which ship inside the package.
+
+### Documentation
+
+- Corrected what `exceljs#1328` is. The 4.5.0 entry called it a report that had
+  been open since 2020. It is a pull request, merged in 2020, which fixed a
+  different fault and left behind the regression test that catches this one.
+  That test passed on Linux — the platform upstream CI ran — and failed on macOS
+  and Windows for six years without being seen.
+
+### Internal
+
+- `got`, used by a single end-to-end test, moved from 9 to 11.8.5, clearing
+  [GHSA-pfrx-2q88-qq97](https://github.com/advisories/GHSA-pfrx-2q88-qq97). It
+  is a devDependency: nothing that depends on this package installs it, and no
+  published code changes because of it. Calling this a security fix for users
+  would be untrue. It also retired a workaround the test had carried since got 9.
+
 ## 4.5.0 — 2026-08-09
 
 The first release under the new name. The API, the module shape and the

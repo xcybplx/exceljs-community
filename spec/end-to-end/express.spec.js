@@ -1,4 +1,3 @@
-const {PassThrough} = require('readable-stream');
 const express = require('express');
 const got = require('got');
 const testutils = require('../utils/index');
@@ -33,8 +32,7 @@ describe('Express', () => {
       decompress: false,
     });
     const wb2 = new Excel.Workbook();
-    // TODO: Remove passThrough with got 10+ (requires node v10+)
-    await wb2.xlsx.read(res.pipe(new PassThrough()));
+    await wb2.xlsx.read(res);
     testutils.checkTestBook(wb2, 'xlsx');
   });
 });
