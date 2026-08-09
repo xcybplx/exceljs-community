@@ -2,9 +2,20 @@ import 'regenerator-runtime/runtime';
 
 import { expect } from 'chai';
 import { PassThrough } from 'stream';
-import ExcelJS from '../../index';
+// Resolved the way a consumer resolves it: types through the package's `types`
+// entry, runtime through `main`. Importing ../../index instead would have
+// pointed at a source file no consumer ever loads.
+import ExcelJS, { Workbook, ValueType } from '../..';
 
 describe('typescript', () => {
+  it('can be imported by name', () => {
+    const wb = new Workbook();
+    const ws = wb.addWorksheet('blort');
+    ws.getCell('A1').value = 7;
+    expect(ws.getCell('A1').type).to.equal(ValueType.Number);
+    expect(new ExcelJS.Workbook()).to.be.instanceOf(Workbook);
+  });
+
   it('can create and buffer xlsx', async () => {
     const wb = new ExcelJS.Workbook();
     const ws = wb.addWorksheet('blort');

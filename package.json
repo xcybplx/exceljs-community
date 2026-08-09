@@ -39,7 +39,6 @@
     "./lib/*.json": "./lib/*.json",
     "./lib/*": "./lib/*.js",
     "./index.d.ts": "./index.d.ts",
-    "./index.ts": "./index.ts",
     "./index.mjs": "./index.mjs",
     "./package.json": "./package.json"
   },
@@ -52,7 +51,6 @@
     "CHANGELOG.md",
     "FORK.md",
     "docs",
-    "index.ts",
     "index.mjs",
     "index.d.ts"
   ],

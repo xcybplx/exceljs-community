@@ -41,6 +41,16 @@ the package, deep paths under `lib/` with and without the `.js` extension, and
 If you reach for a path inside this package that is not covered, that is a bug
 here — please report it.
 
+`index.ts` is gone from the package. It re-exported the ES5 build for a
+TypeScript entry point that nothing resolved to: types come from `index.d.ts`
+and code from the entries above, so it shipped in every tarball unused.
+
+### Internal
+
+- The lint backlog is cleared: 0 errors, from 35 before the repository was
+  tidied. Mostly module paths that named a `.js` extension the resolver adds
+  anyway, or omitted a `.json` one it does not.
+
 ## 4.5.1 — 2026-08-09
 
 **Not a security release, and nothing in the library changed.** This exists to
