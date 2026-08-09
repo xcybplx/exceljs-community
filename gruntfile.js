@@ -1,9 +1,12 @@
+/* eslint-disable import/no-extraneous-dependencies */
+
 'use strict';
+
+const Terser = require('terser');
 
 module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-babel');
   grunt.loadNpmTasks('grunt-browserify');
-  grunt.loadNpmTasks('grunt-terser');
   grunt.loadNpmTasks('grunt-contrib-jasmine');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-exorcise');
@@ -133,6 +136,38 @@ module.exports = function(grunt) {
         },
       },
     },
+  });
+
+  // grunt-terser reports a minification failure through grunt.log.error and then
+  // returns from a forEach callback, which neither fails the task nor stops the
+  // build. The previous dist/*.min.js survives untouched, so a broken bundle
+  // looks exactly like a successful build. Drive terser ourselves instead.
+  grunt.registerMultiTask('terser', 'Minify the browser bundles', function() {
+    const options = this.options();
+
+    return this.files.every(file => {
+      const sources = file.src.reduce(
+        (acc, filepath) => Object.assign(acc, {[filepath]: grunt.file.read(filepath)}),
+        {}
+      );
+
+      const result = Terser.minify(sources, options);
+      if (result.error) {
+        grunt.log.error(`Failed to minify ${file.dest}: ${result.error}`);
+        return false;
+      }
+      if (result.warnings) {
+        grunt.log.warn(result.warnings.join('\n'));
+      }
+
+      grunt.file.write(file.dest, result.code);
+      if (options.sourceMap) {
+        grunt.file.write(options.sourceMap.filename || `${file.dest}.map`, result.map);
+      }
+      grunt.verbose.writeln(`File "${file.dest}" created.`);
+
+      return true;
+    });
   });
 
   grunt.registerTask('build', ['babel:dist', 'browserify', 'terser', 'exorcise', 'copy']);
