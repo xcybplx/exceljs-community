@@ -10,6 +10,71 @@ who reported and diagnosed each problem upstream.
 Every release is a drop-in replacement for `exceljs@4.4.0` unless an entry says
 otherwise in as many words.
 
+## 4.6.1 — 2026-08-09
+
+Not a security release. No API changes: the browser bundle gets smaller, the
+build becomes reproducible, and one thing this fork had been shipping without
+saying so is written down.
+
+### Fixed
+
+- **The browser bundle was 19 KB gzip heavier than `exceljs@4.4.0`**, even
+  though this fork had *removed* a dependency in 4.5.0.
+
+  `browserify-sign` and `hash-base` both published releases that moved their
+  own `readable-stream` dependency from `^3` back to `^2` — `browserify-sign`
+  in 4.2.3, `hash-base` in 3.1.1. On the 3.x line they deduplicated against the
+  `readable-stream` this package already depends on. On 2.x they each pull a
+  private copy, so the bundle carried four complete implementations of Node's
+  streams instead of two: about 103 KB of source.
+
+  An `overrides` block pins both to their last release on the 3.x line.
+  `browserify-sign@4.2.2` is also the release that fixed GHSA-x9w5-v3q2-3rhw,
+  so the pin gives up no security fix, and it resolves the same
+  `elliptic@6.6.1` that the newer releases do.
+
+  `dist/exceljs.min.js` goes from 275,420 to 263,898 bytes gzip.
+  `exceljs@4.4.0`, for reference, is 256,110.
+
+### Changed
+
+- **`package-lock.json` is now committed and CI installs with `npm ci`.**
+
+  It had been suppressed twice over, both inherited from upstream: `.npmrc`
+  carried `package-lock=false`, and `.gitignore` listed the file. Because
+  `dist/` is generated at publish time and has never been in the repository,
+  the browser bundle was resolved from caret ranges on whatever day the release
+  happened — two releases built from identical source could ship different
+  bundles, which is exactly how the regression above arrived unnoticed.
+
+  npm does not publish lockfiles, so nothing changes for anyone installing this
+  package.
+
+### Added
+
+- **A size budget for the browser bundles**, enforced in CI by
+  `npm run test:size`. A bundle that grows passes every functional test in this
+  repository; this is the only check that would have caught the regression
+  above.
+
+### Disclosed
+
+- **This package contains pivot table support that `exceljs@4.4.0` never
+  shipped.** No code changed in this release; what changed is that it is now
+  stated.
+
+  The fork's base is upstream's `master`, not the `4.4.0` tag. That brings six
+  files (`lib/doc/pivot-table.js`, `lib/xlsx/xform/book/workbook-pivot-cache-xform.js`
+  and four under `lib/xlsx/xform/pivot-table/`) which are wired into `Workbook`.
+  This is upstream's own code, merged after 4.4.0 and never released, so it has
+  been through no upstream release and no upstream issue cycle.
+
+  The 4.4.0 public API is unchanged and every existing call still behaves the
+  same way, so "drop-in replacement" holds. Two consequences are worth knowing
+  anyway: `Workbook#toJSON()` now emits a `pivotTables` key that 4.4.0 did not,
+  which matters if you round-trip the model through JSON; and this code is the
+  bulk of the browser bundle's remaining 7.8 KB gzip difference from 4.4.0.
+
 ## 4.6.0 — 2026-08-09
 
 ### Added

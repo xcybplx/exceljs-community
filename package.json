@@ -1,6 +1,6 @@
 {
   "name": "exceljs-community",
-  "version": "4.6.0",
+  "version": "4.6.1",
   "description": "Excel Workbook Manager - Read and Write xlsx and csv Files. Maintained drop-in replacement for exceljs.",
   "private": false,
   "license": "MIT",
@@ -70,6 +70,7 @@
     "test:integration:es5": "export EXCEL_BUILD=es5 && npm run test:integration",
     "test:end-to-end:es5": "export EXCEL_BUILD=es5 && npm run test:end-to-end",
     "test:dist": "mocha --require spec/config/setup spec/dist --recursive",
+    "test:size": "node scripts/check-bundle-size.js",
     "test:manual": "node spec/manual/app.js",
     "test:typescript": "mocha -r ts-node/register spec/typescript/**/*.spec.ts",
     "clean-build": "npm run clean && npm run build",
@@ -170,5 +171,9 @@
     "terser": "^5.49.2",
     "ts-node": "^8.10.2",
     "typescript": "^3.9.7"
+  },
+  "overrides": {
+    "browserify-sign": "4.2.2",
+    "hash-base": "3.1.0"
   }
 }

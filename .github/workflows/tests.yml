@@ -47,10 +47,10 @@ jobs:
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ./npm-cache
-          key: v1-${{ runner.os }}-node-${{ matrix.node-version }}-npm-${{ hashFiles('**/package.json') }}
+          key: v1-${{ runner.os }}-node-${{ matrix.node-version }}-npm-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             v1-${{ runner.os }}-node-${{ matrix.node-version }}-npm-
-      - run: npm install
+      - run: npm ci
       # Deliberately not `npm test`: test:full also runs the jasmine browser
       # suite, which needs Chromium via Puppeteer. Puppeteer's install script
       # is skipped under npm's current default script policy, so browser
@@ -76,11 +76,38 @@ jobs:
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ./npm-cache
-          key: v1-npm-${{ hashFiles('**/package.json') }}
+          key: v1-npm-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             v1-npm-
-      - run: npm install
+      - run: npm ci
       - run: npm run benchmark
+        env:
+          CI: true
+
+  bundle-size:
+    timeout-minutes: 15
+    name: Keep the browser bundle within budget
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 20
+      - name: Create the npm cache directory
+        run: mkdir npm-cache && npm config set cache ./npm-cache --global
+      - name: Cache node modules
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ./npm-cache
+          key: v1-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            v1-npm-
+      - run: npm ci
+      - run: npm run build
+      # A bundle that grows still passes every functional test. This is the
+      # only job that would have caught the 19 KB gzip regression in 4.6.0.
+      - run: npm run test:size
         env:
           CI: true
 
@@ -100,10 +127,10 @@ jobs:
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ./npm-cache
-          key: v1-npm-${{ hashFiles('**/package.json') }}
+          key: v1-npm-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             v1-npm-
-      - run: npm install
+      - run: npm ci
       - run: npm install typescript
       # index.ts imports ./dist/es5, which only exists after a build.
       - run: npm run build
