@@ -27,26 +27,22 @@ Run the suites individually rather than `npm test` — the combined script stops
 the first failure and tells you nothing about the rest:
 
 ```shell
-npm run test:unit          # 883 tests, all passing
-npm run test:integration   # see known failures below
-npm run test:end-to-end
-npm run test:typescript
+npm run test:unit          # 888 tests
+npm run test:integration   # 195 tests
+npm run test:end-to-end    # 12 tests
+npm run test:typescript    # 3 tests
 ```
 
-### Known failures, inherited from 4.4.0
+**Everything passes on a clean checkout.** If something fails for you, it is
+either your change or your environment — it is not a known defect being lived
+with. Earlier versions of this file listed four inherited failures in the
+streaming reader and the TypeScript suite; all of them were fixed in 4.5.0 and
+the list was stale, not accurate.
 
-These fail on a clean checkout and are **not** caused by your change:
-
-| Suite | Test | Area |
-|---|---|---|
-| integration | `issue 1328 – should emit row with Date Object` | streaming reader returns unresolved `sharedString` references |
-| integration | `pull request 1431 – streaming reader should handle rich text within shared strings` | same |
-| integration | `WorkbookReader` | same |
-| typescript | `can create and stream xlsx` | the test itself calls the deprecated `XLSX#createInputStream`, which throws |
-
-If your change makes any of these behave differently — including making them
-pass — say so in the pull request. It may be a real fix, but it needs explaining
-rather than assuming.
+Also run `npm run build && npm run test:size` if you touch anything that reaches
+the browser bundle. Functional tests pass at any bundle size, so they cannot
+catch a size regression; see the section below for which dependencies that
+applies to.
 
 Browser tests (`test:jasmine`, `test:browser`) need Chromium via Puppeteer, whose
 install script npm 11 does not run by default. They are not required for most
