@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/xcybplx/exceljs-community#readme",
   "engines": {
-    "node": ">=8.3.0"
+    "node": ">=22.12.0"
   },
   "main": "./excel.js",
   "browser": "./dist/exceljs.min.js",
@@ -123,7 +123,7 @@
     "pageSetup"
   ],
   "dependencies": {
-    "archiver": "^5.0.0",
+    "archiver": "^8.0.0",
     "dayjs": "^1.8.34",
     "fast-csv": "^4.3.1",
     "jszip": "^3.10.1",

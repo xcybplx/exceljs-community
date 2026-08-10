@@ -48,6 +48,17 @@ describe('StreamBuf', () => {
       sb.on('error', reject);
       s.pipe(sb);
     }));
+  it('returns the destination from pipe', () => {
+    // Readable.pipe returns its destination so callers can chain or wrap.
+    // StreamBuf returned undefined for years, which went unnoticed until
+    // archiver 8 began routing every appended source through
+    // `source.pipe(new PassThrough())` and rejected the undefined result as
+    // not a stream.
+    const source = new StreamBuf();
+    const destination = new StreamBuf();
+    expect(source.pipe(destination)).to.equal(destination);
+  });
+
   it('handle unsupported type of chunk', async () => {
     const stream = new StreamBuf();
     try {

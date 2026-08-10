@@ -13,6 +13,15 @@ const zlib = require('zlib');
 // Headroom over the measured size is about 2%. Raising a number here is a
 // legitimate thing to do; doing it without saying why in the commit message
 // is not.
+//
+// The gzip figure is not machine-independent: it comes from whatever zlib the
+// running Node was built against, so the same bytes measure differently across
+// versions. dist/exceljs.min.js came to 263,883 bytes on Node 26 and 264,624 on
+// Node 20 while the raw size was identical at 971,502. Changing the Node
+// version in the bundle-size CI job therefore moves this number on its own, and
+// can trip a tight ceiling with no real regression behind it. The raw size is
+// the machine-independent one, and it is the one that demonstrates the build is
+// reproducible.
 const BUDGETS = [
   {file: 'dist/exceljs.min.js', raw: 990000, gzip: 269000},
   {file: 'dist/exceljs.bare.min.js', raw: 901000, gzip: 247500},

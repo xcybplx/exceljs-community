@@ -16,7 +16,9 @@ npm install
 npm run build
 ```
 
-Node 18 or newer. The build (grunt + browserify + Babel) is known to work on
+Node 22.12 or newer. The floor is not arbitrary: archiver 8 is ESM-only and the
+streaming writer reaches it from CommonJS through `require(esm)`, which Node
+gained in 22.12. The build (grunt + browserify + Babel) is known to work on
 Node 26.
 
 ## Running the tests
