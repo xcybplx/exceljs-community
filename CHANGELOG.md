@@ -10,6 +10,68 @@ who reported and diagnosed each problem upstream.
 Every release is a drop-in replacement for `exceljs@4.4.0` unless an entry says
 otherwise in as many words.
 
+## 5.0.0 — 2026-08-10
+
+**This release requires Node 22.12 or newer.** That is the whole of the breaking
+change: no API was added, removed or altered, and if you are on a supported Node
+this remains a drop-in replacement for `exceljs@4.4.0`. The major number is here
+because raising a floor excludes people, and that deserves to be visible in the
+version rather than buried in a note.
+
+### Removed
+
+- **Support for Node below 22.12.** The previous floor, `>=8.3.0`, was fiction:
+  the dependency tree already needed 14.14 through `tmp`, and `excel.js` threw on
+  anything below 10.
+
+  The real number now comes from `archiver@8`, which is ESM-only. The streaming
+  writer is CommonJS and reaches it through `require(esm)`, which Node gained in
+  22.12 and backported to 20.19. Node 18 reached end-of-life in April 2025 and
+  Node 20 in April 2026, so CI now tests 22 and 24 rather than 18, 20, 22 and 24.
+
+### Changed
+
+- **`archiver` 5.3.2 → 8.0.0.** Besides going ESM-only, archiver replaced its
+  callable `archiver('zip', options)` factory with one exported class per format,
+  so the writer constructs a `ZipArchive` directly. Every other call into it —
+  `append`, `file`, `pipe`, `finalize` — is unchanged, and so is every ExcelJS
+  API built on top of it.
+
+- **`unzipper` 0.10.14 → 0.12.5.** Swaps the unmaintained `fstream` for
+  `fs-extra` and `big-integer` for `node-int64`. The reader still calls
+  `unzip.Parse({forceStream: true})` exactly as before.
+
+  This removes the last `glob@7` and `inflight` from the production tree — the
+  deprecation upstream #2715 is about. `npm ls inflight glob --omit=dev` now
+  returns empty, and the production tree falls from 114 packages to 93.
+
+- **`saxes` 5.0.1 → 6.0.0.** saxes 6's only breaking change is dropping Node 10;
+  the parser API is untouched. It is one of the few production dependencies that
+  reaches the browser bundle, so it was measured: 30 bytes raw, 6 gzip.
+
+- **`tmp` and `chai-xml` ranges** raised to what the tree already resolved.
+
+### Fixed
+
+- **`StreamBuf.pipe()` did not return its destination**, breaking a contract
+  `Readable.pipe` has always had. Nothing depended on the return value until
+  `archiver@8` began routing appended sources through
+  `source.pipe(new PassThrough())`, received `undefined`, and correctly refused
+  the entry as not a stream. A unit test now covers it.
+
+### Notes
+
+- **`fast-csv` stays on 4 and `readable-stream` stays on 3.** Both are held back
+  by browserify, and `CONTRIBUTING.md` records why in detail. In short:
+  `@fast-csv/format` 5 uses class fields, which browserify's acorn 7 cannot
+  parse and no newer browserify fixes; and `readable-stream` 4 strands the
+  `overrides` that make `browserify-sign` and `hash-base` share our copy, which
+  measured 294,072 bytes gzip against 263,892. Both unblock by replacing the
+  bundler.
+
+- The browser bundle is 263,892 bytes gzip, against 263,898 in 4.6.1 and 256,110
+  for `exceljs@4.4.0`.
+
 ## 4.6.1 — 2026-08-09
 
 Not a security release. No API changes: the browser bundle gets smaller, the

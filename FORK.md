@@ -5,6 +5,57 @@ pull request that reported or diagnosed it. Fixes are implemented independently;
 this file exists so credit for the diagnosis is not lost, and so the reasoning
 behind each change can be found later.
 
+## 5.0.0
+
+### Fixed
+
+#### StreamBuf.pipe() never returned its destination
+
+Not an upstream report — found while upgrading `archiver`, and present in
+`exceljs` since the class was written.
+
+`Readable.pipe` returns its destination so callers can chain or wrap the result.
+`lib/utils/stream-buf.js` returned nothing. No consumer inside ExcelJS ever used
+the return value, so the defect stayed invisible: the streaming writer calls
+`this.zip.pipe(this.stream)` and discards it.
+
+`archiver@8` made it visible. Its `normalizeInputSource` wraps every appended
+source in a `PassThrough` — `return source.pipe(new PassThrough())` — and the
+`undefined` it got back failed the library's own stream check, so every
+`append()` of a `StreamBuf` was rejected with "input source must be valid Stream
+or Buffer instance". Every streaming write failed.
+
+`pipe()` now returns the destination. The unit test covering it was confirmed
+red against the old behaviour before being kept.
+
+### Changed
+
+#### Node 22.12 is the new floor, and archiver 8 is the reason
+
+The declared floor had been `>=8.3.0`, which was never true — `tmp` required
+14.14 and `excel.js` threw below 10. Replacing fiction with an accurate number
+was overdue on its own; `archiver@8` forced a specific one.
+
+archiver 8 ships as ESM only. The streaming writer is CommonJS and reaches it
+through `require(esm)`, a capability Node gained in 22.12 and backported to
+20.19. Nothing supported is left below that line: Node 18 went end-of-life in
+April 2025, Node 20 in April 2026.
+
+archiver 8 also replaced its callable factory with one class per format, so
+`archiver('zip', options)` became `new ZipArchive(options)`. That is confined to
+one line of `lib/stream/xlsx/workbook-writer.js`; no ExcelJS API changed.
+
+#### unzipper 0.12 removes the last deprecated transitive dependencies
+
+Upstream [#2715](https://github.com/exceljs/exceljs/issues/2715) is about
+`inflight` and `glob@7` sitting in the production tree — a memory leak and a
+deprecation rather than a vulnerability, which is why 4.5.0 deferred it.
+
+unzipper 0.12 replaced the unmaintained `fstream` with `fs-extra`, and `fstream`
+was the whole chain: `fstream` → `rimraf@2` → `glob@7` → `inflight`. With
+`archiver@8` having already dropped its own copy, both are now gone entirely and
+the production tree falls from 114 packages to 93.
+
 ## 4.6.0
 
 ### Added

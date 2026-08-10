@@ -50,8 +50,13 @@ The public API is identical to `exceljs@4.4.0`. Migration is one line in
 
 ```diff
 - "exceljs": "^4.4.0"
-+ "exceljs-community": "^4.6.0"
++ "exceljs-community": "^5.0.0"
 ```
+
+**5.0.0 requires Node 22.12 or newer.** That is the only reason for the major
+version; nothing in the API changed. If you are on an older Node, `^4.6.1`
+remains available and is a drop-in replacement for `exceljs@4.4.0` down to
+Node 14.14.
 
 ```js
 const ExcelJS = require('exceljs-community');
@@ -67,7 +72,9 @@ built application got `undefined` — a mismatch that only appeared once bundled
 Deep imports such as `exceljs-community/lib/doc/workbook` and the documented
 `exceljs-community/dist/es5` path keep working unchanged.
 
-Breaking changes are not planned for the 4.x line.
+No breaking change to the API is planned. 5.0.0 raised the Node requirement and
+changed nothing you call; any future major will exist for the same kind of
+reason, and will say so in the same place.
 
 ## Documentation
 
