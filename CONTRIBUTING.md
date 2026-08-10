@@ -52,6 +52,31 @@ Browser tests (`test:jasmine`, `test:browser`) need Chromium via Puppeteer, whos
 install script npm 11 does not run by default. They are not required for most
 contributions.
 
+## Dependencies that cannot move yet
+
+Two production dependencies are deliberately held back, and both are held back
+by browserify rather than by anything in this package. Please don't "helpfully"
+bump them.
+
+**`fast-csv` stays on 4.** browserify parses with acorn 7, which understands
+ES2020 and no more. That ceiling cannot be lifted by upgrading: browserify 17,
+module-deps 6.2.3 and detective 5.2.1 are all the newest releases that exist and
+the chain still ends at `acorn@^7`. `@fast-csv/format` 5 uses class fields, so
+16 of its 24 files fail to parse.
+
+**`readable-stream` stays on 3.** This one is not syntax but deduplication. The
+`overrides` block pins `browserify-sign` and `hash-base` to their last releases
+on the readable-stream 3.x line precisely so they share our copy. Moving our own
+dependency to 4 leaves them behind and the bundle then carries three stream
+implementations instead of two: measured at 294,072 bytes gzip against 263,892,
+which would undo the 4.6.1 reduction and then some. Forcing the whole tree onto
+4 with an override is not a way out either -- it removes 76 packages and takes
+browserify itself with it, so the build stops running at all.
+
+Both unblock the same way, by replacing browserify with a bundler that parses
+current syntax. Until then the size budget in `scripts/check-bundle-size.js` is
+what stops these from landing by accident.
+
 ## Pull requests
 
 - Describe what breaks, and how the test demonstrates it.
