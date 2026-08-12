@@ -10,6 +10,53 @@ who reported and diagnosed each problem upstream.
 Every release is a drop-in replacement for `exceljs@4.4.0` unless an entry says
 otherwise in as many words.
 
+## 5.1.0 — 2026-08-12
+
+Drop-in replacement for `exceljs@4.4.0` and for 5.0.0. The three names below were
+already in `index.d.ts`; what changes is whether they survive to runtime.
+
+### Added
+
+- **`PaperSize` is now a real export.** It was an ambient `const enum`, which
+  TypeScript erases, so it existed only inside a compilation — and not even
+  there for anyone building with `isolatedModules`, where reading it is an
+  error (TS2748). That covers esbuild, Vite and Angular. The values now live in
+  `lib/doc/enums.js` and reach both the Node and browser entries the same way
+  every other enum does, so `PaperSize.A4` works wherever `ValueType.Number`
+  does.
+
+  If you compile without `isolatedModules`, note that the value is no longer
+  inlined at the use site; it is read from the module at runtime.
+
+### Fixed
+
+- **`Anchor` is declared as an interface, not a class.** The package has never
+  exported it as a value, so `new Anchor(...)` type-checked and then threw. The
+  constructor signature was wrong as well. The type is unchanged for the only
+  thing anyone does with it — reading `image.range.tl` and `.br`.
+
+- **`config` is gone from `index.d.ts`.** Upstream removed promise dependency
+  injection when it moved to native promises and left the declaration and the
+  documentation behind. `ExcelJS.config.setValue('promise', …)` has been
+  `undefined` since 4.0. The `Config` section of `docs/api.md` and its Chinese
+  translation went with it.
+
+### Project
+
+- `spec/end-to-end/module-exports.spec.js` now holds `index.d.ts` to the same
+  standard as `index.mjs`: the names it declares as values must be exactly the
+  keys of the CommonJS entry. The classification comes from the TypeScript
+  compiler rather than a pattern over the file, because the difference between
+  a namespace of interfaces and a namespace of functions is not visible in the
+  text.
+
+- README documents three things that bite consumers and cannot be fixed from
+  here: test runners that resolve Node conditions and so miss the browser
+  bundle, Angular's `allowedCommonJsDependencies` still naming `exceljs`, and
+  the fact that `ModelContainer` and `stream` do not exist in the browser
+  bundle although `index.d.ts` declares them. All three came out of a
+  production migration off `exceljs@4.4.0`.
+
 ## 5.0.0 — 2026-08-10
 
 **This release requires Node 22.12 or newer.** That is the whole of the breaking

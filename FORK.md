@@ -5,6 +5,109 @@ pull request that reported or diagnosed it. Fixes are implemented independently;
 this file exists so credit for the diagnosis is not lost, and so the reasoning
 behind each change can be found later.
 
+## 5.1.0
+
+### Fixed
+
+#### index.d.ts promised three exports the runtime never had
+
+Found by an application migrating a production frontend from `exceljs@4.4.0`,
+not by anything here.
+
+The CommonJS entry has nine keys. `index.d.ts` declared twelve names as values:
+`Anchor`, `config` and `PaperSize` on top of them. So `import {Anchor}` passed
+type-checking and arrived `undefined`, and `ExcelJS.config.setValue('promise',
+…)` — which `docs/api.md` still gave as a worked example — had been `undefined`
+since upstream moved to native promises in 4.0 and left its own documentation
+behind.
+
+This is the 4.6.0 mismatch running the other way. Then the types declared named
+exports the package did not deliver; here the types declare values the runtime
+does not have. Both times the two halves were individually defensible and no
+test could see between them, because `spec/typescript/exceljs.spec.ts` imports
+by path — which skips the `exports` map, as its own comment says — and touches
+only `Workbook` and `ValueType`, both of which exist.
+
+`Anchor` becomes an interface. It is not something a consumer constructs; the
+library hands it out through `ImageRange`. The declared constructor was wrong
+anyway — `lib/doc/anchor.js` takes `(worksheet, address, offset)`, not a model
+object. Nothing that worked can break, because nothing that called `new
+Anchor()` ever worked.
+
+`config` is deleted, along with the `Config` section of `docs/api.md` and of the
+Chinese translation. Documenting a function that does not exist is worse than
+not documenting it.
+
+`PaperSize` goes the other way: the declaration stays and the runtime catches
+up. It was an ambient `const enum`, which is not merely absent at runtime — it
+is unreadable to any consumer compiling with `isolatedModules`, where the
+compiler answers with TS2748 rather than a value. That is every consumer on
+esbuild, Vite or Angular. Reproduced on TypeScript 3.9.10 here and on 6.0.3 in
+the migrating application, so it is not an artefact of an old compiler. Twelve
+values moved into `lib/doc/enums.js`, from where the Node and browser entries
+pick them up like every other enum.
+
+The two halves of that last change belong together: `const enum` inlines at the
+use site and `declare enum` reads from the module, so demoting the declaration
+without adding the runtime would have replaced a compile error with an
+undefined.
+
+#### The types were the one artefact nothing checked
+
+`spec/end-to-end/module-exports.spec.js` covered `index.mjs` against the
+CommonJS entry from 4.6.0 onwards, and covered `index.d.ts` against nothing. It
+now asserts that the names `index.d.ts` declares as values are exactly the keys
+of the CommonJS entry, which puts all three artefacts on one list.
+
+The names are classified by the TypeScript compiler — `getExportsOfModule`
+filtered on `SymbolFlags.Value` — rather than by a pattern over the file, and
+the difference is not cosmetic. `namespace stream` holds classes and is a value;
+`namespace config` held a function and was one too; the hundred `interface`
+declarations around them are not. A regexp sees three namespaces. The migrating
+application's own grep, written to find exactly this, missed `PaperSize` because
+`export const enum` puts the words in an order the pattern did not expect.
+
+A `const enum` counts as a value in that check on purpose, so adding one fails
+the build rather than shipping another declaration nobody can use.
+
+The check needs the compiler's JavaScript API, and that is not something to
+assume stays available: `typescript@7` ships ESM-only with no `main`, so
+`require('typescript')` returns `{version, versionMajorMinor}` and nothing else.
+The devDependency here is far below that, and the end-to-end job resolves it
+from the lockfile, so the check is unaffected — but it says which version
+stopped it working rather than failing on `undefined` three lines later. Anyone
+carrying `typescript: "^6"` gets 7 from a plain `npm install`, and every tool
+that loads the compiler API through `require` stops with it.
+
+What the check does not cover is the browser bundle, which has never carried
+`ModelContainer` or `stream` — the streaming reader and writer need Node
+streams and a Node zip library. One `index.d.ts` describes both entries, so it
+declares them either way. README says so now; a set comparison would be the
+wrong instrument, because the two entries are deliberately different.
+
+### Documented
+
+#### Two things that break consumers and cannot be fixed from here
+
+Both surfaced during the same migration.
+
+A test runner that resolves Node conditions — Vitest and Jest do, even with
+`environment: 'jsdom'` — takes the `require` entry rather than the `browser`
+one, reaches the streaming writer and lands on `archiver@8`, which has been
+ESM-only since 5.0.0 and sits inside a CommonJS package. The file dies while
+importing, so the runner reports no tests rather than a failure. Aliasing the
+package to `dist/exceljs.min.js` is not a workaround but the same file the
+bundler would have chosen. `test.server.deps.inline: ['archiver']`, which the
+error message recommends, does not help; verified on Vitest 4.1.10.
+
+Angular's `allowedCommonJsDependencies` matches package names, and this package
+has a different name from `exceljs`. A stale entry costs nothing visible — the
+build succeeds and CI stays green — while the warning the entry existed to
+silence comes back. The list filters diagnostics and touches nothing else, so
+the cost is not a slower bundle; it is that a warning someone once chose to
+silence is now noise again, and the next CommonJS dependency to arrive does so
+unannounced.
+
 ## 5.0.0
 
 ### Fixed
