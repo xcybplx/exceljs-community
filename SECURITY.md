@@ -24,4 +24,4 @@ what actually affects you.
 | Version | Supported |
 |---|---|
 | 4.5.x | yes |
-| 4.4.x and earlier (upstream `exceljs`) | no — unmaintained since October 2023 |
+| 4.4.x and earlier (upstream `exceljs`) | no, unmaintained since October 2023 |

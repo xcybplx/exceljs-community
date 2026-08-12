@@ -16,8 +16,8 @@ reasoning behind each in [FORK.md](FORK.md).
 ## Why this fork exists
 
 The upstream project accumulated 650+ open issues and 140+ open pull requests
-with no maintainer to act on them. Several forks appeared — by MUI, protobi,
-nuvo, DevExtreme and others — but each was created to solve its owner's specific
+with no maintainer to act on them. Several forks appeared (by MUI, protobi,
+nuvo, DevExtreme and others), but each was created to solve its owner's specific
 problems, and their maintainers
 [stated publicly](https://github.com/exceljs/exceljs/issues/2764) that they did
 not intend to take over maintenance of the library itself.
@@ -31,7 +31,7 @@ These promises are deliberately small, so that they hold even in a bad month:
 
 1. **Security releases within 30 days** of a disclosed vulnerability in a
    production dependency.
-2. **A response to new issues within 14 days.** A response is not a fix — it may
+2. **A response to new issues within 14 days.** A response is not a fix; it may
    be a question, a triage label, or an honest "not soon".
 3. **No promises about features or bug-fix timelines.** Anything beyond the two
    points above happens when it happens.
@@ -40,7 +40,7 @@ These promises are deliberately small, so that they hold even in a bad month:
    tracker, along with an attempt to hand the repository to someone else.
 
 The fourth point matters most. Upstream was not killed by a maintainer stepping
-away — that is normal and nobody's fault. It was killed by the silence that
+away, which is normal and nobody's fault. It was killed by the silence that
 followed, which left users guessing for two years.
 
 ## Compatibility
@@ -68,7 +68,7 @@ import {Workbook, ValueType} from 'exceljs-community';
 
 Named imports are new in 4.6.0. Before it, `index.d.ts` declared them and the
 package did not deliver them, so TypeScript accepted `import {Workbook}` and the
-built application got `undefined` — a mismatch that only appeared once bundled.
+built application got `undefined`, a mismatch that only appeared once bundled.
 Deep imports such as `exceljs-community/lib/doc/workbook` and the documented
 `exceljs-community/dist/es5` path keep working unchanged.
 
@@ -81,7 +81,7 @@ reason, and will say so in the same place.
 `dist/exceljs.min.js` carries `Workbook` and the enums. `ModelContainer` and the
 whole `stream` namespace are missing from it, because the streaming reader and
 writer are built on Node streams and a Node zip library. `index.d.ts` describes
-one package rather than one per environment, so it declares both — in the
+one package rather than one per environment, so it declares both. In the
 browser they are `undefined`, and this has been true since long before the fork.
 
 Nothing else differs: `Workbook`, `xlsx.load`, `xlsx.writeBuffer`, `csv` and
@@ -93,8 +93,8 @@ The `exports` map sends a bundler to `dist/exceljs.min.js` through the `browser`
 condition and Node to `excel.js` through `require`. A test runner is neither:
 Vitest and Jest resolve Node conditions even with `environment: 'jsdom'`, so a
 test covering browser code takes the Node entry, reaches the streaming writer,
-and lands on `archiver@8` — ESM-only since 5.0.0, and shipped inside a CommonJS
-package:
+and lands on `archiver@8`, which has been ESM-only since 5.0.0 and ships inside
+a CommonJS package:
 
 ```
 SyntaxError: Cannot use import statement outside a module
@@ -110,8 +110,8 @@ bundle the browser would have got anyway:
 resolve: {alias: {'exceljs-community': 'exceljs-community/dist/exceljs.min.js'}}
 ```
 
-`test.server.deps.inline: ['archiver']` — the fix the error message itself
-suggests — does not work. Verified on Vitest 4.1.10 with `environment: 'jsdom'`;
+`test.server.deps.inline: ['archiver']`, the fix the error message itself
+suggests, does not work. Verified on Vitest 4.1.10 with `environment: 'jsdom'`;
 the cause is how the resolver picks conditions, not anything specific to that
 version, so expect Jest to behave the same way.
 
@@ -119,7 +119,7 @@ version, so expect Jest to behave the same way.
 
 `allowedCommonJsDependencies` in `angular.json` matches on the package name, and
 this package has a different one. An entry left saying `exceljs` still builds,
-which is the problem — the warning it was there to silence comes back, and
+which is the problem: the warning it was there to silence comes back, and
 nothing fails:
 
 ```
@@ -135,7 +135,7 @@ Rename the entry as part of the migration.
 ## Documentation
 
 The full API reference lives in [docs/api.md](docs/api.md). It is inherited from
-upstream and **has not yet been verified** against the current code — sections
+upstream and **has not yet been verified** against the current code. Sections
 are reviewed as the areas they describe are worked on. If something there
 contradicts what you observe, that is worth an issue.
 
@@ -150,7 +150,7 @@ changelog up to 4.4.0 is archived in
 
 ## Contributing
 
-Contributions are welcome, including bug reports with no fix attached — a
+Contributions are welcome, including bug reports with no fix attached: a
 failing test that demonstrates a problem is a genuinely useful contribution.
 
 One firm rule: **every fix ships with a regression test** that fails before the
@@ -168,4 +168,4 @@ which is preserved here in full.
 
 ## License
 
-MIT — unchanged from upstream. See [LICENSE](LICENSE).
+MIT, unchanged from upstream. See [LICENSE](LICENSE).

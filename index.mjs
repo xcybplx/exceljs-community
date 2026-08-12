@@ -1,6 +1,6 @@
 // The library is CommonJS, and it assembles its export object at runtime with
 // Object.assign. Node's cjs-module-lexer only reads static patterns, so it
-// finds no named exports at all and `import {Workbook}` yields undefined —
+// finds no named exports at all and `import {Workbook}` yields undefined,
 // while index.d.ts promises that very import. Type-checking passes and the
 // build fails, which is the worst way for a mismatch to be discovered.
 //

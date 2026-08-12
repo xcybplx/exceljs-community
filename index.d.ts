@@ -16,7 +16,7 @@ export declare enum DocumentType {
 }
 
 // Declared as `const enum` until 5.1.0, which made it unreadable to anyone
-// compiling with isolatedModules — esbuild, Vite, Angular — because an ambient
+// compiling with isolatedModules (esbuild, Vite, Angular) because an ambient
 // const enum has no runtime to fall back on. lib/doc/enums.js now carries these
 // values, so this is an ordinary enum and works wherever the others do.
 export declare enum PaperSize {
@@ -904,7 +904,7 @@ export interface IAnchor {
 }
 // An interface, not a class, because the package has never exported Anchor as a
 // value: `new Anchor(...)` type-checked and then threw. The constructor named
-// here was wrong as well — lib/doc/anchor.js takes (worksheet, address, offset).
+// here was wrong as well: lib/doc/anchor.js takes (worksheet, address, offset).
 // The library hands these out through ImageRange; nothing outside builds one.
 export interface Anchor extends IAnchor {
 	worksheet: Worksheet;
@@ -2040,7 +2040,7 @@ export class ModelContainer {
 
 // The shape of the runtime object, for `import ExcelJS from 'exceljs-community'`
 // and for `require`. Until 4.6.0 this file declared the named exports and no
-// default, while the package delivered a default and no named exports — the two
+// default, while the package delivered a default and no named exports: the two
 // halves of one mismatch, each invisible from the other side.
 declare const ExcelJS: {
 	Workbook: typeof Workbook;

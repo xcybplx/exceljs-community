@@ -10,7 +10,7 @@ who reported and diagnosed each problem upstream.
 Every release is a drop-in replacement for `exceljs@4.4.0` unless an entry says
 otherwise in as many words.
 
-## 5.1.0 — 2026-08-12
+## 5.1.0 - 2026-08-12
 
 Drop-in replacement for `exceljs@4.4.0` and for 5.0.0. The three names below were
 already in `index.d.ts`; what changes is whether they survive to runtime.
@@ -18,7 +18,7 @@ already in `index.d.ts`; what changes is whether they survive to runtime.
 ### Added
 
 - **`PaperSize` is now a real export.** It was an ambient `const enum`, which
-  TypeScript erases, so it existed only inside a compilation — and not even
+  TypeScript erases, so it existed only inside a compilation, and not even
   there for anyone building with `isolatedModules`, where reading it is an
   error (TS2748). That covers esbuild, Vite and Angular. The values now live in
   `lib/doc/enums.js` and reach both the Node and browser entries the same way
@@ -33,7 +33,7 @@ already in `index.d.ts`; what changes is whether they survive to runtime.
 - **`Anchor` is declared as an interface, not a class.** The package has never
   exported it as a value, so `new Anchor(...)` type-checked and then threw. The
   constructor signature was wrong as well. The type is unchanged for the only
-  thing anyone does with it — reading `image.range.tl` and `.br`.
+  thing anyone does with it: reading `image.range.tl` and `.br`.
 
 - **`config` is gone from `index.d.ts`.** Upstream removed promise dependency
   injection when it moved to native promises and left the declaration and the
@@ -57,7 +57,7 @@ already in `index.d.ts`; what changes is whether they survive to runtime.
   bundle although `index.d.ts` declares them. All three came out of a
   production migration off `exceljs@4.4.0`.
 
-## 5.0.0 — 2026-08-10
+## 5.0.0 - 2026-08-10
 
 **This release requires Node 22.12 or newer.** That is the whole of the breaking
 change: no API was added, removed or altered, and if you are on a supported Node
@@ -80,15 +80,15 @@ version rather than buried in a note.
 
 - **`archiver` 5.3.2 → 8.0.0.** Besides going ESM-only, archiver replaced its
   callable `archiver('zip', options)` factory with one exported class per format,
-  so the writer constructs a `ZipArchive` directly. Every other call into it —
-  `append`, `file`, `pipe`, `finalize` — is unchanged, and so is every ExcelJS
+  so the writer constructs a `ZipArchive` directly. Every other call into it,
+  `append`, `file`, `pipe`, `finalize`, is unchanged, and so is every ExcelJS
   API built on top of it.
 
 - **`unzipper` 0.10.14 → 0.12.5.** Swaps the unmaintained `fstream` for
   `fs-extra` and `big-integer` for `node-int64`. The reader still calls
   `unzip.Parse({forceStream: true})` exactly as before.
 
-  This removes the last `glob@7` and `inflight` from the production tree — the
+  This removes the last `glob@7` and `inflight` from the production tree, the
   deprecation upstream #2715 is about. `npm ls inflight glob --omit=dev` now
   returns empty, and the production tree falls from 114 packages to 93.
 
@@ -119,7 +119,7 @@ version rather than buried in a note.
 - The browser bundle is 263,892 bytes gzip, against 263,898 in 4.6.1 and 256,110
   for `exceljs@4.4.0`.
 
-## 4.6.1 — 2026-08-09
+## 4.6.1 - 2026-08-09
 
 Not a security release. No API changes: the browser bundle gets smaller, the
 build becomes reproducible, and one thing this fork had been shipping without
@@ -131,7 +131,7 @@ saying so is written down.
   though this fork had *removed* a dependency in 4.5.0.
 
   `browserify-sign` and `hash-base` both published releases that moved their
-  own `readable-stream` dependency from `^3` back to `^2` — `browserify-sign`
+  own `readable-stream` dependency from `^3` back to `^2`: `browserify-sign`
   in 4.2.3, `hash-base` in 3.1.1. On the 3.x line they deduplicated against the
   `readable-stream` this package already depends on. On 2.x they each pull a
   private copy, so the bundle carried four complete implementations of Node's
@@ -153,7 +153,7 @@ saying so is written down.
   carried `package-lock=false`, and `.gitignore` listed the file. Because
   `dist/` is generated at publish time and has never been in the repository,
   the browser bundle was resolved from caret ranges on whatever day the release
-  happened — two releases built from identical source could ship different
+  happened: two releases built from identical source could ship different
   bundles, which is exactly how the regression above arrived unnoticed.
 
   npm does not publish lockfiles, so nothing changes for anyone installing this
@@ -184,7 +184,7 @@ saying so is written down.
   which matters if you round-trip the model through JSON; and this code is the
   bulk of the browser bundle's remaining 7.8 KB gzip difference from 4.4.0.
 
-## 4.6.0 — 2026-08-09
+## 4.6.0 - 2026-08-09
 
 ### Added
 
@@ -213,7 +213,7 @@ the package, deep paths under `lib/` with and without the `.js` extension, and
 `dist/es5`, which `docs/api.md` documents for older Node versions.
 
 If you reach for a path inside this package that is not covered, that is a bug
-here — please report it.
+here, please report it.
 
 `index.ts` is gone from the package. It re-exported the ES5 build for a
 TypeScript entry point that nothing resolved to: types come from `index.d.ts`
@@ -225,7 +225,7 @@ and code from the entries above, so it shipped in every tarball unused.
   tidied. Mostly module paths that named a `.js` extension the resolver adds
   anyway, or omitted a `.json` one it does not.
 
-## 4.5.1 — 2026-08-09
+## 4.5.1 - 2026-08-09
 
 **Not a security release, and nothing in the library changed.** This exists to
 correct the 4.5.0 notes, which ship inside the package.
@@ -235,7 +235,7 @@ correct the 4.5.0 notes, which ship inside the package.
 - Corrected what `exceljs#1328` is. The 4.5.0 entry called it a report that had
   been open since 2020. It is a pull request, merged in 2020, which fixed a
   different fault and left behind the regression test that catches this one.
-  That test passed on Linux — the platform upstream CI ran — and failed on macOS
+  That test passed on Linux (the platform upstream CI ran) and failed on macOS
   and Windows for six years without being seen.
 
 ### Internal
@@ -246,7 +246,7 @@ correct the 4.5.0 notes, which ship inside the package.
   published code changes because of it. Calling this a security fix for users
   would be untrue. It also retired a workaround the test had carried since got 9.
 
-## 4.5.0 — 2026-08-09
+## 4.5.0 - 2026-08-09
 
 The first release under the new name. The API, the module shape and the
 supported Node versions are unchanged from `exceljs@4.4.0`; switching should be
@@ -256,7 +256,7 @@ a matter of changing the dependency name.
 
 - **The streaming reader no longer drops entries from the archive.**
   `WorkbookReader` returned unresolved `{sharedString: N}` references instead of
-  cell values when a workbook stored its worksheet before `sharedStrings.xml` —
+  cell values when a workbook stored its worksheet before `sharedStrings.xml`,
   a layout several spreadsheet applications produce. Affects any code reading
   through `ExcelJS.stream.xlsx.WorkbookReader`.
 
@@ -278,8 +278,8 @@ a matter of changing the dependency name.
   and the original author's attribution are preserved. Repository metadata,
   issue tracker and homepage point at the new home.
 
-- **`uuid` is no longer a dependency.** The library asked it for one thing — a
-  version 4 value for a conditional formatting attribute — which it now
+- **`uuid` is no longer a dependency.** The library asked it for one thing, a
+  version 4 value for a conditional formatting attribute, which it now
   generates itself, preferring `crypto.randomUUID`. Generated values keep the
   same shape, so written files are unchanged. `npm audit --omit=dev` is clean
   and the production dependency count drops from eight to seven.
@@ -298,7 +298,7 @@ a matter of changing the dependency name.
 ### Internal
 
 - `grunt build` now fails when minification fails. It used to log the error,
-  exit 0 and leave the previous `dist/*.min.js` in place — and `package.json`
+  exit 0 and leave the previous `dist/*.min.js` in place, and `package.json`
   points browser consumers at that file, so a stale bundle could have been
   published without anyone noticing.
 

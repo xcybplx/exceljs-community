@@ -17,7 +17,7 @@ not by anything here.
 The CommonJS entry has nine keys. `index.d.ts` declared twelve names as values:
 `Anchor`, `config` and `PaperSize` on top of them. So `import {Anchor}` passed
 type-checking and arrived `undefined`, and `ExcelJS.config.setValue('promise',
-…)` — which `docs/api.md` still gave as a worked example — had been `undefined`
+…)` , which `docs/api.md` still gave as a worked example, had been `undefined`
 since upstream moved to native promises in 4.0 and left its own documentation
 behind.
 
@@ -25,12 +25,12 @@ This is the 4.6.0 mismatch running the other way. Then the types declared named
 exports the package did not deliver; here the types declare values the runtime
 does not have. Both times the two halves were individually defensible and no
 test could see between them, because `spec/typescript/exceljs.spec.ts` imports
-by path — which skips the `exports` map, as its own comment says — and touches
+by path, which skips the `exports` map, as its own comment says, and touches
 only `Workbook` and `ValueType`, both of which exist.
 
 `Anchor` becomes an interface. It is not something a consumer constructs; the
 library hands it out through `ImageRange`. The declared constructor was wrong
-anyway — `lib/doc/anchor.js` takes `(worksheet, address, offset)`, not a model
+anyway: `lib/doc/anchor.js` takes `(worksheet, address, offset)`, not a model
 object. Nothing that worked can break, because nothing that called `new
 Anchor()` ever worked.
 
@@ -39,7 +39,7 @@ Chinese translation. Documenting a function that does not exist is worse than
 not documenting it.
 
 `PaperSize` goes the other way: the declaration stays and the runtime catches
-up. It was an ambient `const enum`, which is not merely absent at runtime — it
+up. It was an ambient `const enum`, which is not merely absent at runtime; it
 is unreadable to any consumer compiling with `isolatedModules`, where the
 compiler answers with TS2748 rather than a value. That is every consumer on
 esbuild, Vite or Angular. Reproduced on TypeScript 3.9.10 here and on 6.0.3 in
@@ -59,8 +59,8 @@ CommonJS entry from 4.6.0 onwards, and covered `index.d.ts` against nothing. It
 now asserts that the names `index.d.ts` declares as values are exactly the keys
 of the CommonJS entry, which puts all three artefacts on one list.
 
-The names are classified by the TypeScript compiler — `getExportsOfModule`
-filtered on `SymbolFlags.Value` — rather than by a pattern over the file, and
+The names are classified by the TypeScript compiler (`getExportsOfModule`
+filtered on `SymbolFlags.Value`) rather than by a pattern over the file, and
 the difference is not cosmetic. `namespace stream` holds classes and is a value;
 `namespace config` held a function and was one too; the hundred `interface`
 declarations around them are not. A regexp sees three namespaces. The migrating
@@ -74,13 +74,13 @@ The check needs the compiler's JavaScript API, and that is not something to
 assume stays available: `typescript@7` ships ESM-only with no `main`, so
 `require('typescript')` returns `{version, versionMajorMinor}` and nothing else.
 The devDependency here is far below that, and the end-to-end job resolves it
-from the lockfile, so the check is unaffected — but it says which version
+from the lockfile, so the check is unaffected, but it says which version
 stopped it working rather than failing on `undefined` three lines later. Anyone
 carrying `typescript: "^6"` gets 7 from a plain `npm install`, and every tool
 that loads the compiler API through `require` stops with it.
 
 What the check does not cover is the browser bundle, which has never carried
-`ModelContainer` or `stream` — the streaming reader and writer need Node
+`ModelContainer` or `stream`: the streaming reader and writer need Node
 streams and a Node zip library. One `index.d.ts` describes both entries, so it
 declares them either way. README says so now; a set comparison would be the
 wrong instrument, because the two entries are deliberately different.
@@ -91,8 +91,8 @@ wrong instrument, because the two entries are deliberately different.
 
 Both surfaced during the same migration.
 
-A test runner that resolves Node conditions — Vitest and Jest do, even with
-`environment: 'jsdom'` — takes the `require` entry rather than the `browser`
+A test runner that resolves Node conditions (Vitest and Jest do, even with
+`environment: 'jsdom'`) takes the `require` entry rather than the `browser`
 one, reaches the streaming writer and lands on `archiver@8`, which has been
 ESM-only since 5.0.0 and sits inside a CommonJS package. The file dies while
 importing, so the runner reports no tests rather than a failure. Aliasing the
@@ -101,8 +101,8 @@ bundler would have chosen. `test.server.deps.inline: ['archiver']`, which the
 error message recommends, does not help; verified on Vitest 4.1.10.
 
 Angular's `allowedCommonJsDependencies` matches package names, and this package
-has a different name from `exceljs`. A stale entry costs nothing visible — the
-build succeeds and CI stays green — while the warning the entry existed to
+has a different name from `exceljs`. A stale entry costs nothing visible, as
+the build succeeds and CI stays green, while the warning the entry existed to
 silence comes back. The list filters diagnostics and touches nothing else, so
 the cost is not a slower bundle; it is that a warning someone once chose to
 silence is now noise again, and the next CommonJS dependency to arrive does so
@@ -114,7 +114,7 @@ unannounced.
 
 #### StreamBuf.pipe() never returned its destination
 
-Not an upstream report — found while upgrading `archiver`, and present in
+Not an upstream report, but found while upgrading `archiver`, and present in
 `exceljs` since the class was written.
 
 `Readable.pipe` returns its destination so callers can chain or wrap the result.
@@ -123,7 +123,7 @@ the return value, so the defect stayed invisible: the streaming writer calls
 `this.zip.pipe(this.stream)` and discards it.
 
 `archiver@8` made it visible. Its `normalizeInputSource` wraps every appended
-source in a `PassThrough` — `return source.pipe(new PassThrough())` — and the
+source in a `PassThrough` (`return source.pipe(new PassThrough())`) and the
 `undefined` it got back failed the library's own stream check, so every
 `append()` of a `StreamBuf` was rejected with "input source must be valid Stream
 or Buffer instance". Every streaming write failed.
@@ -135,7 +135,7 @@ red against the old behaviour before being kept.
 
 #### Node 22.12 is the new floor, and archiver 8 is the reason
 
-The declared floor had been `>=8.3.0`, which was never true — `tmp` required
+The declared floor had been `>=8.3.0`, which was never true: `tmp` required
 14.14 and `excel.js` threw below 10. Replacing fiction with an accurate number
 was overdue on its own; `archiver@8` forced a specific one.
 
@@ -151,7 +151,7 @@ one line of `lib/stream/xlsx/workbook-writer.js`; no ExcelJS API changed.
 #### unzipper 0.12 removes the last deprecated transitive dependencies
 
 Upstream [#2715](https://github.com/exceljs/exceljs/issues/2715) is about
-`inflight` and `glob@7` sitting in the production tree — a memory leak and a
+`inflight` and `glob@7` sitting in the production tree, a memory leak and a
 deprecation rather than a vulnerability, which is why 4.5.0 deferred it.
 
 unzipper 0.12 replaced the unmaintained `fstream` with `fs-extra`, and `fstream`
@@ -167,8 +167,8 @@ the production tree falls from 114 packages to 93.
 
 `index.d.ts` declared `Workbook` and 105 other named exports; the package
 delivered none. The CommonJS entry builds its export object at runtime with
-`Object.assign`, so `cjs-module-lexer` — the static analyser Node uses to offer
-named exports from CommonJS — found nothing, and an ES module importing the
+`Object.assign`, so `cjs-module-lexer` (the static analyser Node uses to offer
+named exports from CommonJS) found nothing, and an ES module importing the
 package received a namespace of `default` and `module.exports` alone.
 
 Every layer was individually defensible and the combination was not: the types
@@ -191,7 +191,7 @@ it cannot drift unnoticed.
 ## 4.5.1
 
 No change to library behaviour. Corrects the description of `exceljs#1328` in
-the 4.5.0 notes, and moves the `got` devDependency to 11.8.5 — a test-only
+the 4.5.0 notes, and moves the `got` devDependency to 11.8.5, a test-only
 dependency that never reaches anyone installing this package.
 
 ## 4.5.0
@@ -207,14 +207,14 @@ passed on Linux, which is what upstream CI ran, and failed on macOS and Windows
 for the next six years without anyone seeing it.
 
 `WorkbookReader` returned unresolved `{sharedString: N}` references instead of
-cell values when a workbook stored its worksheet before `sharedStrings.xml` —
+cell values when a workbook stored its worksheet before `sharedStrings.xml`,
 the layout produced by several spreadsheet applications.
 
 Root cause was not in the reader but in `lib/utils/iterate-stream.js`, which
 paused the stream around each `yield`. Sources like unzipper's entry stream keep
 working while paused and emit `end` once their input is exhausted, so any entry
-not yet delivered was dropped silently. The reader's own workaround — writing
-the early worksheet to a temp file — was itself the delay that triggered the
+not yet delivered was dropped silently. The reader's own workaround, writing
+the early worksheet to a temp file, was itself the delay that triggered the
 loss, so the mechanism meant to fix the ordering caused the bug.
 
 The failure is timing-dependent, which is why it reproduced on macOS and Windows
@@ -235,8 +235,8 @@ The library asked `uuid` for one thing: a version 4 value for the `x14Id`
 attribute of a conditional formatting extension, requested with no arguments.
 That identifier has to be unique inside a workbook; it is not a security token.
 
-`uuid@8` carries GHSA-w5hq-g745-h8pq, which cannot be reached from here — it
-requires a caller-supplied buffer — but it surfaced in every consumer audit.
+`uuid@8` carries GHSA-w5hq-g745-h8pq, which cannot be reached from here, as it
+requires a caller-supplied buffer, but it surfaced in every consumer audit.
 Upgrading was not available either: from 11.1.1 onwards `uuid` ships ES2021
 syntax that the browser build cannot process, and 12.0.0 drops CommonJS.
 
@@ -256,7 +256,7 @@ eight to seven.
   is and what is promised of it.
 - `grunt build` now fails when minification fails. `grunt-terser` logged the
   error and carried on, leaving the previous `dist/*.min.js` in place and the
-  build green — and `package.json` points browser consumers at that file. The
+  build green, and `package.json` points browser consumers at that file. The
   gruntfile drives `terser` itself now, on version 5.
 
 ## Not planned for 4.5.0
@@ -266,6 +266,6 @@ eight to seven.
   `5.1.9`, which are not affected. The report originated from `pnpm audit`,
   which applies a wider range. Nothing to fix in the code.
 - **`archiver` 5 → 7 (upstream exceljs#2715).** `inflight@1.0.6` is present in
-  the production tree, but npm assigns it no advisory — it is a memory leak and
+  the production tree, but npm assigns it no advisory: it is a memory leak and
   a maintenance burden, not a vulnerability. Deferred to 4.6.0, where it will be
   described as such.

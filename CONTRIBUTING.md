@@ -1,7 +1,7 @@
 # Contributing
 
 Bug reports without a fix are welcome. A failing test that demonstrates a problem
-is a genuinely useful contribution — it can be picked up by someone else.
+is a genuinely useful contribution: it can be picked up by someone else.
 
 ## The one firm rule
 
@@ -23,7 +23,7 @@ Node 26.
 
 ## Running the tests
 
-Run the suites individually rather than `npm test` — the combined script stops at
+Run the suites individually rather than `npm test`, as the combined script stops at
 the first failure and tells you nothing about the rest:
 
 ```shell
@@ -34,7 +34,7 @@ npm run test:typescript    # 3 tests
 ```
 
 **Everything passes on a clean checkout.** If something fails for you, it is
-either your change or your environment — it is not a known defect being lived
+either your change or your environment. It is not a known defect being lived
 with. Earlier versions of this file listed four inherited failures in the
 streaming reader and the TypeScript suite; all of them were fixed in 4.5.0 and
 the list was stale, not accurate.
@@ -76,6 +76,6 @@ what stops these from landing by accident.
 ## Pull requests
 
 - Describe what breaks, and how the test demonstrates it.
-- Don't change the package version — that happens at release time.
+- Don't change the package version; that happens at release time.
 - If you are porting a fix reported elsewhere, say where. Diagnoses get credited.
 - All contributions are released under the project's MIT licence.

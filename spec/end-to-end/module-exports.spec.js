@@ -12,7 +12,7 @@ const {name: PACKAGE} = require(path.join(ROOT, 'package.json'));
 // which is the one thing verquire cannot do: it loads files by path and so
 // skips the package.json entry points and exports map entirely. Every failure
 // here is invisible to the rest of the suite and shows up only in a consumer's
-// build — which is how exceljs#1328's neighbour, the interop gap, reached
+// build, which is how exceljs#1328's neighbour, the interop gap, reached
 // production undetected.
 
 const consumers = [];
@@ -178,7 +178,7 @@ describe('module exports', () => {
   // index.d.ts is the third artifact that has to agree with the other two, and
   // it agreed with neither: it declared Anchor, config and PaperSize as values
   // the runtime has never had. `import {Anchor}` type-checked and arrived
-  // undefined — the mismatch 4.6.0 fixed, running the other way.
+  // undefined: the mismatch 4.6.0 fixed, running the other way.
   describe('from the type declarations', () => {
     let dir;
     before(() => {
@@ -193,7 +193,7 @@ describe('module exports', () => {
     //
     // A `const enum` counts as a value here on purpose. TypeScript erases it,
     // so it can never reach the runtime, and a consumer compiling with
-    // isolatedModules — which is every consumer on esbuild, Vite or Angular —
+    // isolatedModules (which is every consumer on esbuild, Vite or Angular)
     // cannot even read one out of a published .d.ts. Failing is the point.
     it('promise exactly what the CommonJS entry has', () => {
       // TypeScript 7 is ESM-only and offers none of the compiler API to

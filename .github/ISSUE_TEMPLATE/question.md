@@ -16,6 +16,6 @@ Include the smallest piece of code that shows the problem, and the version of
 
 ---
 
-Before opening this, please search the existing issues — and the [upstream
+Before opening this, please search the existing issues, and the [upstream
 exceljs issues](https://github.com/exceljs/exceljs/issues), which cover eleven
 years of questions and are still the best archive of answers for this API.

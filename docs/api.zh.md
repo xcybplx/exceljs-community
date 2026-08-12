@@ -1,7 +1,7 @@
 # ExcelJS API 参考 / API reference (Chinese)
 
 > **Inherited translation.** Carried over from exceljs 4.4.0, not verified
-> against the current code, and not actively maintained — no maintainer here
+> against the current code, and not actively maintained: no maintainer here
 > reads Chinese well enough to keep it accurate. Treat
 > [api.md](api.md) as authoritative where the two disagree.
 >
