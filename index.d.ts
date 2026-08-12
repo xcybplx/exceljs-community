@@ -15,7 +15,11 @@ export declare enum DocumentType {
 	Xlsx = 1
 }
 
-export const enum PaperSize {
+// Declared as `const enum` until 5.1.0, which made it unreadable to anyone
+// compiling with isolatedModules — esbuild, Vite, Angular — because an ambient
+// const enum has no runtime to fall back on. lib/doc/enums.js now carries these
+// values, so this is an ordinary enum and works wherever the others do.
+export declare enum PaperSize {
 	Legal = 5,
 	Executive = 7,
 	A4 = 9,
@@ -898,19 +902,12 @@ export interface IAnchor {
 	nativeColOff: number;
 	nativeRowOff: number;
 }
-export class Anchor implements IAnchor {
-	col: number;
-	nativeCol: number;
-	nativeColOff: number;
-	nativeRow: number;
-	nativeRowOff: number;
-	row: number;
-
-	private readonly colWidth: number;
-	private readonly rowHeight: number;
+// An interface, not a class, because the package has never exported Anchor as a
+// value: `new Anchor(...)` type-checked and then threw. The constructor named
+// here was wrong as well — lib/doc/anchor.js takes (worksheet, address, offset).
+// The library hands these out through ImageRange; nothing outside builds one.
+export interface Anchor extends IAnchor {
 	worksheet: Worksheet;
-
-	constructor(model?: IAnchor | object);
 }
 export interface ImageRange {
 	tl: Anchor;
@@ -1908,10 +1905,6 @@ export interface Table extends Required<TableProperties> {
 	removeColumns: (colIndex: number, count: number) => void
 }
 
-export namespace config {
-	function setValue(key: 'promise', promise: any): void;
-}
-
 export namespace stream {
 	namespace xlsx {
 		interface WorkbookWriterOptions {
@@ -2059,6 +2052,7 @@ declare const ExcelJS: {
 	DocumentType: typeof DocumentType;
 	ReadingOrder: typeof ReadingOrder;
 	ErrorValue: typeof ErrorValue;
+	PaperSize: typeof PaperSize;
 };
 
 export default ExcelJS;

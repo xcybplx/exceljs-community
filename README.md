@@ -76,6 +76,62 @@ No breaking change to the API is planned. 5.0.0 raised the Node requirement and
 changed nothing you call; any future major will exist for the same kind of
 reason, and will say so in the same place.
 
+### What the browser bundle does not have
+
+`dist/exceljs.min.js` carries `Workbook` and the enums. `ModelContainer` and the
+whole `stream` namespace are missing from it, because the streaming reader and
+writer are built on Node streams and a Node zip library. `index.d.ts` describes
+one package rather than one per environment, so it declares both — in the
+browser they are `undefined`, and this has been true since long before the fork.
+
+Nothing else differs: `Workbook`, `xlsx.load`, `xlsx.writeBuffer`, `csv` and
+every enum behave the same on either entry.
+
+### Test runners that resolve Node conditions
+
+The `exports` map sends a bundler to `dist/exceljs.min.js` through the `browser`
+condition and Node to `excel.js` through `require`. A test runner is neither:
+Vitest and Jest resolve Node conditions even with `environment: 'jsdom'`, so a
+test covering browser code takes the Node entry, reaches the streaming writer,
+and lands on `archiver@8` — ESM-only since 5.0.0, and shipped inside a CommonJS
+package:
+
+```
+SyntaxError: Cannot use import statement outside a module
+ ❯ exceljs-community/lib/stream/xlsx/workbook-writer.js
+```
+
+The file fails while importing, so the runner reports no tests rather than a
+failed one, which reads like a mistake in your own code. Point the runner at the
+bundle the browser would have got anyway:
+
+```ts
+// vitest.config.ts
+resolve: {alias: {'exceljs-community': 'exceljs-community/dist/exceljs.min.js'}}
+```
+
+`test.server.deps.inline: ['archiver']` — the fix the error message itself
+suggests — does not work. Verified on Vitest 4.1.10 with `environment: 'jsdom'`;
+the cause is how the resolver picks conditions, not anything specific to that
+version, so expect Jest to behave the same way.
+
+### Angular
+
+`allowedCommonJsDependencies` in `angular.json` matches on the package name, and
+this package has a different one. An entry left saying `exceljs` still builds,
+which is the problem — the warning it was there to silence comes back, and
+nothing fails:
+
+```
+▲ [WARNING] Module 'exceljs-community' used by '...' is not ESM
+```
+
+Nothing about the bundle changes; the allow-list filters diagnostics, not
+bundling. What you lose is the warning itself, so the next CommonJS dependency
+to enter the build arrives silently.
+
+Rename the entry as part of the migration.
+
 ## Documentation
 
 The full API reference lives in [docs/api.md](docs/api.md). It is inherited from

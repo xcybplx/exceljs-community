@@ -2,6 +2,7 @@ const {execFileSync} = require('child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const ts = require('typescript');
 
 const ROOT = path.resolve(__dirname, '../..');
 // eslint-disable-next-line import/no-dynamic-require
@@ -171,6 +172,66 @@ describe('module exports', () => {
         `const wb = await import('${PACKAGE}/lib/doc/workbook.js');\nconsole.log(typeof wb.default);`
       );
       expect(out).to.equal('function');
+    });
+  });
+
+  // index.d.ts is the third artifact that has to agree with the other two, and
+  // it agreed with neither: it declared Anchor, config and PaperSize as values
+  // the runtime has never had. `import {Anchor}` type-checked and arrived
+  // undefined — the mismatch 4.6.0 fixed, running the other way.
+  describe('from the type declarations', () => {
+    let dir;
+    before(() => {
+      dir = consumer('commonjs');
+    });
+
+    // The compiler decides which names are values, rather than a pattern
+    // reading the file, because the distinction that matters is not in the
+    // text: `namespace stream` holds classes and is a value, `namespace config`
+    // held a function and was one too, and the hundred `interface` declarations
+    // around them are not. A regexp over `export` lines cannot see any of that.
+    //
+    // A `const enum` counts as a value here on purpose. TypeScript erases it,
+    // so it can never reach the runtime, and a consumer compiling with
+    // isolatedModules — which is every consumer on esbuild, Vite or Angular —
+    // cannot even read one out of a published .d.ts. Failing is the point.
+    it('promise exactly what the CommonJS entry has', () => {
+      // TypeScript 7 is ESM-only and offers none of the compiler API to
+      // require, so a bump past 6 turns this check into a TypeError about
+      // undefined three lines down. Say which version broke it instead.
+      if (typeof ts.createProgram !== 'function') {
+        throw new Error(
+          `typescript ${ts.version} exposes no compiler API to require; ` +
+            'this check needs one to tell a declared value from a declared type'
+        );
+      }
+
+      const declarations = path.join(ROOT, 'index.d.ts');
+      const program = ts.createProgram([declarations], {
+        target: ts.ScriptTarget.ES2017,
+      });
+      const checker = program.getTypeChecker();
+      const module_ = checker.getSymbolAtLocation(
+        program.getSourceFile(declarations)
+      );
+      const declared = checker
+        .getExportsOfModule(module_)
+        // SymbolFlags is a bit field; masking is how the compiler is asked.
+        // eslint-disable-next-line no-bitwise
+        .filter(symbol => (symbol.getFlags() & ts.SymbolFlags.Value) !== 0)
+        .map(symbol => symbol.getName())
+        // `export default` names the runtime object itself, and module.exports
+        // is that object; there is no key for it to line up with.
+        .filter(name => name !== 'default')
+        .sort();
+
+      const out = run(
+        dir,
+        'keys.js',
+        `console.log(Object.keys(require('${PACKAGE}')).sort().join(','));`
+      );
+
+      expect(declared.join(',')).to.equal(out);
     });
   });
 });

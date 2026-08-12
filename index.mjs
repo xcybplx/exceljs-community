@@ -20,6 +20,7 @@ export const {
   DocumentType,
   ReadingOrder,
   ErrorValue,
+  PaperSize,
 } = ExcelJS;
 
 export default ExcelJS;

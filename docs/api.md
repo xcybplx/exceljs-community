@@ -107,7 +107,6 @@ For the upstream changelog, see [history-upstream.md](history-upstream.md).
       <li><a href="#error-value">Error Value</a></li>
     </ul>
   </li>
-  <li><a href="#config">Config</a></li>
   <li><a href="#known-issues">Known Issues</a></li>
   <li><a href="history-upstream.md">Release History (upstream archive)</a></li>
 </ul>
@@ -2766,22 +2765,9 @@ cell.styles renamed to cell.style
 Promises returned from functions switched from Bluebird to native node Promise which can break calling code
  if they rely on Bluebird's extra features.
 
-To mitigate this the following two changes were added to 0.3.0:
-
-* A more fully featured and still browser compatible promise lib is used by default. This lib supports many of the features of Bluebird but with a much lower footprint.
-* An option to inject a different Promise implementation. See <a href="#config">Config</a> section for more details.
-
-# Config[⬆](#contents)<!-- Link generated with jump2header -->
-
-ExcelJS now supports dependency injection for the promise library.
- You can restore Bluebird promises by including the following code in your module...
-
-```javascript
-ExcelJS.config.setValue('promise', require('bluebird'));
-```
-
-Please note: I have tested ExcelJS with bluebird specifically (since up until recently this was the library it used).
- From the tests I have done it will not work with Q.
+0.3.0 mitigated this with a lighter promise library and an option to inject your own implementation. Neither
+ survives: the library has used native promises since 4.0, and `ExcelJS.config.setValue('promise', ...)` no
+ longer exists. `index.d.ts` kept promising it until 5.1.0.
 
 # Caveats[⬆](#contents)<!-- Link generated with jump2header -->
 

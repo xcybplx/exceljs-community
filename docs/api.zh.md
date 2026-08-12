@@ -107,7 +107,6 @@
       <li><a href="#错误值">错误值</a></li>
     </ul>
   </li>
-  <li><a href="#配置">配置</a></li>
   <li><a href="#已知的问题">已知的问题</a></li>
   <li><a href="history-upstream.md">发布历史 / Release history (upstream archive)</a></li>
 </ul>
@@ -2633,22 +2632,8 @@ worksheet.getCell('A2').value = { error: '#VALUE!' };
 
 从 Bluebird 切换到 Node 原生 Promise 的函数返回的 Promise 如果依赖 Bluebird 的额外功能，则可能会破坏调用代码。
 
-为了减少这种情况的出现，在0.3.0中添加了以下两个更改：
-
-* 默认情况下使用功能更全且仍与浏览器兼容的 promise lib。 该库支持 Bluebird 的许多功能，但占用空间少得多。
-* 注入其他 Promise 实现的选项。有关更多详细信息，请参见<a href="#配置">配置</a>部分。
-
-
-
-# 配置[⬆](#目录)<!-- Link generated with jump2header -->
-
-ExcelJS现在支持对 Promise 库的依赖项注入。您可以通过在模块中包含以下代码来还原 Bluebird Promise。
-
-```javascript
-ExcelJS.config.setValue('promise', require('bluebird'));
-```
-
-请注意：我已经使用 bluebird 专门测试了 ExcelJS（直到最近，这是它使用的库）。根据我所做的测试，它不适用于 Q。
+0.3.0 通过一个更轻量的 promise 库和一个注入自定义实现的选项来缓解此问题。两者均已不复存在：自 4.0 起本库使用
+原生 Promise，`ExcelJS.config.setValue('promise', ...)` 也已移除。`index.d.ts` 直到 5.1.0 才停止声明它。
 
 # 注意事项[⬆](#目录)<!-- Link generated with jump2header -->
 
