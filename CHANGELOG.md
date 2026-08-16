@@ -10,6 +10,22 @@ who reported and diagnosed each problem upstream.
 Every release is a drop-in replacement for `exceljs@4.4.0` unless an entry says
 otherwise in as many words.
 
+## 5.1.1 - 2026-08-16
+
+Security-only release. This remains a drop-in replacement for `exceljs@4.4.0`
+and 5.1.0.
+
+### Fixed
+
+- **Patched the development dependency tree for `braces`.** The build tooling
+  now resolves `braces@3.0.3`, which includes the fix for GHSA-grv7-fg5c-xmjg.
+
+### Project
+
+- Removed the duplicate asset-size workflow after its third-party action stopped
+  running on the supported GitHub Actions runtime. The maintained test workflow
+  continues to build the browser bundle and enforce its size budget.
+
 ## 5.1.0 - 2026-08-12
 
 Drop-in replacement for `exceljs@4.4.0` and for 5.0.0. The three names below were
