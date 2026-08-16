@@ -1,6 +1,6 @@
 {
   "name": "exceljs-community",
-  "version": "5.1.0",
+  "version": "5.1.1",
   "description": "Excel Workbook Manager - Read and Write xlsx and csv Files. Maintained drop-in replacement for exceljs.",
   "private": false,
   "license": "MIT",
@@ -173,6 +173,7 @@
     "typescript": "^3.9.7"
   },
   "overrides": {
+    "braces": "^3.0.3",
     "browserify-sign": "4.2.2",
     "hash-base": "3.1.0",
     "js-yaml": "^3.15.1",
