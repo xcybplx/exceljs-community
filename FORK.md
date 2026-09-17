@@ -5,6 +5,42 @@ pull request that reported or diagnosed it. Fixes are implemented independently;
 this file exists so credit for the diagnosis is not lost, and so the reasoning
 behind each change can be found later.
 
+## 5.2.0
+
+### Added
+
+#### quotePrefix, the attribute that says a cell is text
+
+Asked for by an application exporting supplier and contractor names from an
+external system into twelve XLSX reports, where the name is whatever the source
+system holds.
+
+A value beginning with `=`, `+`, `-`, `@`, a tab or a carriage return is the
+classic formula injection vector. This library was never the weak point: a
+string goes out as `t="s"`, not as a formula, so the `.xlsx` itself is inert.
+The distinction is carried by the cell type alone, though, and the cell type is
+the first thing lost when a sheet is saved as CSV or re-exported by another
+tool. What survives that trip is `quotePrefix`, the OOXML flag Excel writes for
+itself when you type a leading apostrophe.
+
+Neither this fork nor upstream could set it. It is not a cell property but an
+attribute on the cell's entry in `cellXfs`, inside `styles.xml`, so nothing in
+the public API reached it. The alternative everyone ends up with is prefixing
+the value with `'`, which is not the same thing: it changes the value the
+consumer reads back, and the apostrophe is visible in some readers.
+
+It is implemented where the rest of the style model lives, which makes most of
+the work disappear. `StyleXform` renders and parses the attribute;
+`StylesXform.addStyleModel` and `getStyleModel` carry it in both directions. The
+style cache keys on the rendered XML of the `<xf>` element, so deduplication and
+the read-write round trip both fall out of that, with no separate bookkeeping to
+get wrong. `Cell`, `Row` and `Column` expose it the way they expose `protection`,
+including inheritance from a row or column, and `Column.isDefault` counts it, so
+a column carrying nothing but the flag is still written out.
+
+`<dxf>` does not take the attribute in the OOXML schema, so conditional
+formatting styles do not gain it.
+
 ## 5.1.0
 
 ### Fixed

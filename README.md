@@ -45,8 +45,9 @@ followed, which left users guessing for two years.
 
 ## Compatibility
 
-The public API is identical to `exceljs@4.4.0`. Migration is one line in
-`package.json`, with no changes to your code:
+The public API is a superset of `exceljs@4.4.0`: everything upstream has behaves
+the same, and 5.2.0 adds one property, [`quotePrefix`](#marking-a-cell-as-text).
+Migration is one line in `package.json`, with no changes to your code:
 
 ```diff
 - "exceljs": "^4.4.0"
@@ -75,6 +76,30 @@ Deep imports such as `exceljs-community/lib/doc/workbook` and the documented
 No breaking change to the API is planned. 5.0.0 raised the Node requirement and
 changed nothing you call; any future major will exist for the same kind of
 reason, and will say so in the same place.
+
+### Marking a cell as text
+
+`quotePrefix` tells Excel that a cell holds text, so its value is never read as
+a formula:
+
+```js
+ws.getCell('A1').value = '=1+1';
+ws.getCell('A1').quotePrefix = true; // reads back as the string '=1+1'
+```
+
+This is the OOXML attribute of the same name, which Excel itself writes when you
+type a leading apostrophe. It is part of the style, so it can also be set on a
+row or a column, and it survives a read-write round trip. Unlike prefixing the
+value with `'` yourself, it changes neither the stored value nor what the user
+sees.
+
+It is worth setting on any text you did not write yourself. A value beginning
+with `=`, `+`, `-`, `@`, a tab or a carriage return is the classic formula
+injection vector. ExcelJS writes such a value as a string rather than a formula,
+so the `.xlsx` is safe on its own, but the distinction is lost once the sheet is
+converted to CSV or re-exported by another tool. `quotePrefix` is not.
+
+See [docs/api.md](docs/api.md#quote-prefix) for details.
 
 ### What the browser bundle does not have
 
