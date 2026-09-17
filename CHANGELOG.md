@@ -10,6 +10,31 @@ who reported and diagnosed each problem upstream.
 Every release is a drop-in replacement for `exceljs@4.4.0` unless an entry says
 otherwise in as many words.
 
+## 5.2.0 - 2026-09-17
+
+Drop-in replacement for `exceljs@4.4.0` and for every 5.x release before it.
+Nothing existing changed; one property was added.
+
+### Added
+
+- **`quotePrefix` marks a cell as text.** Setting `cell.quotePrefix = true`
+  (or `quotePrefix` in a style object, or on a row or column) writes the OOXML
+  `quotePrefix="1"` attribute on the cell's `cellXfs` entry. Excel then never
+  reads the value as a formula, and shows nothing extra: unlike prefixing the
+  value with `'` yourself, neither the stored value nor the display changes.
+  The flag is read back from a file, so a read-write round trip preserves it,
+  and styles carrying it deduplicate the same way every other style does.
+
+  This exists for exported text you did not write yourself. A value beginning
+  with `=`, `+`, `-`, `@`, a tab or a carriage return is the classic formula
+  injection vector. This library already wrote such a value as a string rather
+  than a formula, so the `.xlsx` was never the problem; the distinction was lost
+  once a sheet reached CSV or another tool's re-export, and `quotePrefix` is
+  what carries it across.
+
+  There was no way to reach the attribute from the API before, in this fork or
+  upstream. See [docs/api.md](docs/api.md#quote-prefix).
+
 ## 5.1.1 - 2026-08-16
 
 Security-only release. This remains a drop-in replacement for `exceljs@4.4.0`
