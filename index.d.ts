@@ -303,6 +303,13 @@ export interface Style {
 	protection: Partial<Protection>;
 	border: Partial<Borders>;
 	fill: Fill;
+
+	/**
+	 * Marks the cell as text (OOXML quotePrefix). Excel then never reads the
+	 * value as a formula and shows no leading apostrophe. Optional, so existing
+	 * Style literals keep compiling.
+	 */
+	quotePrefix?: boolean;
 }
 
 export type DataValidationOperator =
@@ -660,6 +667,7 @@ export interface Column {
 	font?: Partial<Font>;
 	alignment?: Partial<Alignment>;
 	protection?: Partial<Protection>;
+	quotePrefix?: boolean;
 
 	toString(): string
 	equivalentTo(other: Column): boolean

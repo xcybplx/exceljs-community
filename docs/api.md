@@ -55,6 +55,7 @@ For the upstream changelog, see [history-upstream.md](history-upstream.md).
           <li><a href="#borders">Borders</a></li>
           <li><a href="#fills">Fills</a></li>
           <li><a href="#rich-text">Rich Text</a></li>
+          <li><a href="#quote-prefix">Quote Prefix</a></li>
         </ul>
       </li>
       <li><a href="#conditional-formatting">Conditional Formatting</a></li>
@@ -1370,6 +1371,7 @@ Styles are set by assigning the following properties:
 * <a href="#alignment">alignment</a>
 * <a href="#borders">border</a>
 * <a href="#fills">fill</a>
+* <a href="#quote-prefix">quotePrefix</a>
 
 ```javascript
 // assign a style to a cell
@@ -1666,6 +1668,32 @@ expect(ws.getCell('A1').text).to.equal('This is a colorful text with in-cell for
 expect(ws.getCell('A1').type).to.equal(Excel.ValueType.RichText);
 
 ```
+
+### Quote Prefix[⬆](#contents)<!-- Link generated with jump2header -->
+
+`quotePrefix` marks a cell as text. Excel then never reads the value as a
+formula, and unlike the `'` you would type in the application, nothing is added
+to the value and nothing is displayed.
+
+```javascript
+ws.getCell('A1').value = '=1+1';
+ws.getCell('A1').quotePrefix = true;
+```
+
+The cell reads back as the string `=1+1`. This is the OOXML `quotePrefix`
+attribute on the cell's `cellXfs` entry, so it is part of the style and can be
+set on a row or column as well:
+
+```javascript
+ws.getColumn('name').quotePrefix = true;
+```
+
+It is worth setting on any text you did not write yourself. ExcelJS already
+writes such a value as a string rather than a formula, so the `.xlsx` file is
+safe on its own, but a value beginning with `=`, `+`, `-`, `@`, a tab or a
+carriage return can still be executed after the sheet is converted to CSV or
+re-exported by another tool. `quotePrefix` survives that conversion in a way the
+cell type alone does not.
 
 ### Cell Protection[⬆](#contents)<!-- Link generated with jump2header -->
 

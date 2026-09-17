@@ -146,5 +146,53 @@ describe('Worksheet', () => {
         testUtils.styles.fills.redGreenDarkTrellis
       );
     });
+
+    describe('quotePrefix', () => {
+      it('sets and reads the flag on a cell', () => {
+        const wb = new Excel.Workbook();
+        const ws = wb.addWorksheet('basket');
+
+        ws.getCell('A1').value = '=cmd|calc';
+        ws.getCell('A1').quotePrefix = true;
+        ws.getCell('B1').value = 'plain';
+
+        expect(ws.getCell('A1').quotePrefix).to.equal(true);
+        expect(ws.getCell('A1').style.quotePrefix).to.equal(true);
+        expect(ws.getCell('B1').quotePrefix).to.be.undefined();
+      });
+
+      it('inherits the flag from the row', () => {
+        const wb = new Excel.Workbook();
+        const ws = wb.addWorksheet('basket');
+
+        ws.getRow(1).quotePrefix = true;
+        ws.getCell('A1').value = '-1+2';
+
+        expect(ws.getRow(1).quotePrefix).to.equal(true);
+        expect(ws.getCell('A1').quotePrefix).to.equal(true);
+        expect(ws.getCell('A2').quotePrefix).to.be.undefined();
+      });
+
+      it('inherits the flag from the column', () => {
+        const wb = new Excel.Workbook();
+        const ws = wb.addWorksheet('basket');
+
+        ws.getColumn(1).quotePrefix = true;
+        ws.getCell('A1').value = '@here';
+
+        expect(ws.getColumn(1).quotePrefix).to.equal(true);
+        expect(ws.getCell('A1').quotePrefix).to.equal(true);
+        expect(ws.getCell('B1').quotePrefix).to.be.undefined();
+      });
+
+      it('stops a column carrying only the flag from counting as default', () => {
+        const wb = new Excel.Workbook();
+        const ws = wb.addWorksheet('basket');
+
+        expect(ws.getColumn(1).isDefault).to.equal(true);
+        ws.getColumn(1).quotePrefix = true;
+        expect(ws.getColumn(1).isDefault).to.equal(false);
+      });
+    });
   });
 });

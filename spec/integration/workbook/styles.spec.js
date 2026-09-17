@@ -15,6 +15,37 @@ const richTextSampleA1 = require('../data/rich-text-sample-a1.json');
 
 describe('Workbook', () => {
   describe('Styles', () => {
+    it('round-trips quotePrefix through an xlsx file', () => {
+      const wb = new ExcelJS.Workbook();
+      const ws = wb.addWorksheet('injection');
+
+      ws.getCell('A1').value = '=1+1';
+      ws.getCell('A1').quotePrefix = true;
+      ws.getCell('A2').value = '@handle';
+      ws.getCell('A2').quotePrefix = true;
+      ws.getCell('A2').font = testUtils.styles.fonts.comicSansUdB16;
+      ws.getCell('A3').value = 'harmless';
+
+      return wb.xlsx
+        .writeBuffer()
+        .then(buffer => new ExcelJS.Workbook().xlsx.load(buffer))
+        .then(wb2 => {
+          const ws2 = wb2.getWorksheet('injection');
+
+          expect(ws2.getCell('A1').quotePrefix).to.equal(true);
+          expect(ws2.getCell('A1').value).to.equal('=1+1');
+          expect(ws2.getCell('A1').type).to.equal(ExcelJS.ValueType.String);
+
+          expect(ws2.getCell('A2').quotePrefix).to.equal(true);
+          expect(ws2.getCell('A2').font).to.deep.equal(
+            testUtils.styles.fonts.comicSansUdB16
+          );
+
+          expect(ws2.getCell('A3').quotePrefix).to.be.undefined();
+          expect(ws2.getCell('A3').value).to.equal('harmless');
+        });
+    });
+
     it('row styles and columns properly', () => {
       const wb = new ExcelJS.Workbook();
       const ws = wb.addWorksheet('blort');

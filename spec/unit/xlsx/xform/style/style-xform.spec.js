@@ -100,6 +100,40 @@ const expectations = [
     tests: ['render', 'renderIn', 'parse'],
   },
   {
+    title: 'Quote Prefix',
+    create() {
+      return new StyleXform({xfId: true});
+    },
+    preparedModel: {numFmtId: 0, fontId: 0, fillId: 0, borderId: 0, xfId: 0, quotePrefix: true},
+    xml:
+      '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" quotePrefix="1"/>',
+    get parsedModel() {
+      return this.preparedModel;
+    },
+    tests: ['render', 'renderIn', 'parse'],
+  },
+  {
+    title: 'Quote Prefix with other style parts',
+    create() {
+      return new StyleXform({xfId: true});
+    },
+    preparedModel: {
+      numFmtId: 0,
+      fontId: 5,
+      fillId: 0,
+      borderId: 0,
+      xfId: 0,
+      quotePrefix: true,
+      alignment: {horizontal: 'center', vertical: 'middle'},
+    },
+    xml:
+      '<xf numFmtId="0" fontId="5" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1" quotePrefix="1"><alignment horizontal="center" vertical="center"/></xf>',
+    get parsedModel() {
+      return this.preparedModel;
+    },
+    tests: ['render', 'renderIn', 'parse'],
+  },
+  {
     title: 'Protected',
     create() {
       return new StyleXform({xfId: true});
