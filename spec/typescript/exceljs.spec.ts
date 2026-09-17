@@ -46,4 +46,21 @@ describe('typescript', () => {
     const ws2 = wb2.getWorksheet('blort');
     expect(ws2.getCell('A1').value).to.equal(7);
   });
+
+  it('types quotePrefix on cell, row, column and style', async () => {
+    const wb = new ExcelJS.Workbook();
+    const ws = wb.addWorksheet('blort');
+
+    ws.getCell('A1').value = '=1+1';
+    ws.getCell('A1').quotePrefix = true;
+    ws.getRow(2).quotePrefix = true;
+    ws.getColumn(3).quotePrefix = true;
+    ws.getCell('D1').style = { quotePrefix: true };
+
+    const buffer = await wb.xlsx.writeBuffer({ useStyles: true });
+    const wb2 = new ExcelJS.Workbook();
+    await wb2.xlsx.load(buffer as Buffer);
+    const ws2 = wb2.getWorksheet('blort');
+    expect(ws2.getCell('A1').quotePrefix).to.equal(true);
+  });
 });
