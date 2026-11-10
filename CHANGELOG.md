@@ -10,6 +10,22 @@ who reported and diagnosed each problem upstream.
 Every release is a drop-in replacement for `exceljs@4.4.0` unless an entry says
 otherwise in as many words.
 
+## 5.2.2 - 2026-11-10
+
+Drop-in replacement for `exceljs@4.4.0` and for every 5.x release before it.
+No API changed.
+
+### Fixed
+
+- **A worksheet with both a table and a note no longer comes out corrupt.**
+  Excel reported "We found a problem with some content" and repaired the sheet
+  down to nothing. The writer put `<legacyDrawing>`, the anchor for the VML
+  shapes behind notes, after `<tableParts>` and `<extLst>`, but the worksheet
+  schema is a sequence that wants it directly after `<drawing>`. It is now
+  written in that position. Only the order of elements in the written XML
+  changed; reading was not affected. The streaming `WorksheetWriter` cannot
+  write tables and is unchanged.
+
 ## 5.2.1 - 2026-10-19
 
 Drop-in replacement for `exceljs@4.4.0` and for every 5.x release before it.

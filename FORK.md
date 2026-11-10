@@ -5,6 +5,31 @@ pull request that reported or diagnosed it. Fixes are implemented independently;
 this file exists so credit for the diagnosis is not lost, and so the reasoning
 behind each change can be found later.
 
+## 5.2.2
+
+### Fixed
+
+#### Notes in a sheet with a table made the file unreadable in Excel
+
+Reported upstream in
+[exceljs/exceljs#1369](https://github.com/exceljs/exceljs/issues/1369).
+@rheidari diagnosed it there and fixed it in
+[exceljs/exceljs#2079](https://github.com/exceljs/exceljs/pull/2079), which has
+been open since 2022. @KRKnet ported that fix to this fork in
+[#4](https://github.com/xcybplx/exceljs-community/pull/4) and added the
+regression test the upstream pull request lacked.
+
+`CT_Worksheet` is a sequence, and `<legacyDrawing>` must come directly after
+`<drawing>`, before `<picture>`, `<tableParts>` and `<extLst>`. The writer
+appended it after everything else. With notes alone that order was still valid,
+because nothing else came after `<drawing>`; a table, a background image or an
+extension list made the sheet invalid. The `worksheet-xform.js` change
+is the upstream one, unchanged.
+
+The streaming `WorksheetWriter` writes `<picture>` before `<legacyDrawing>` when a
+sheet has both a background image and notes. That is the same class of problem
+and is left for a separate change.
+
 ## 5.2.0
 
 ### Added
