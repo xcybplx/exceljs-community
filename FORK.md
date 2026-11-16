@@ -5,6 +5,32 @@ pull request that reported or diagnosed it. Fixes are implemented independently;
 this file exists so credit for the diagnosis is not lost, and so the reasoning
 behind each change can be found later.
 
+## 5.2.3
+
+### Fixed
+
+#### U+FFFE and U+FFFF made the written XML malformed
+
+@dennev reported and fixed it in
+[#5](https://github.com/xcybplx/exceljs-community/pull/5), after reporting the
+same defect upstream as
+[exceljs/exceljs#3112](https://github.com/exceljs/exceljs/issues/3112) with the
+fix in [exceljs/exceljs#3113](https://github.com/exceljs/exceljs/pull/3113).
+
+`xmlEncode` in `lib/utils/utils.js` already dropped the C0 control characters
+and DEL that XML 1.0 forbids; the two noncharacters at the top of the Basic
+Multilingual Plane were missing from that list. They can also arrive without the
+caller's help, because reading decodes `_xFFFF_` in a shared string to U+FFFF.
+Lone surrogates were checked as well and need no handling: Node's UTF-8
+encoder turns them into U+FFFD before the XML reaches the archive.
+
+#### Pivot table names and values were written without XML encoding
+
+Found while reviewing #5, whose description notes that the pivot table xforms
+bypass `xmlEncode`. `cache-field.js`, `pivot-cache-records-xform.js` and
+`pivot-table-xform.js` build XML from template strings and interpolated header
+names and cell values as they were. They now go through `xmlEncode`.
+
 ## 5.2.2
 
 ### Fixed

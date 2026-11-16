@@ -10,6 +10,27 @@ who reported and diagnosed each problem upstream.
 Every release is a drop-in replacement for `exceljs@4.4.0` unless an entry says
 otherwise in as many words.
 
+## 5.2.3 - 2026-11-16
+
+Drop-in replacement for `exceljs@4.4.0` and for every 5.x release before it.
+No API changed.
+
+### Fixed
+
+- **Text containing U+FFFE or U+FFFF no longer makes the written file
+  unreadable.** XML 1.0 allows neither character, but they were written
+  unchanged, so this library failed to load its own file with
+  `disallowed character` and LibreOffice showed the cell as empty. They are now
+  removed on writing, the same way the control characters XML forbids already
+  were. This covers every string written through the shared XML encoder (cell
+  values, sheet names, notes, document properties and so on), with `Workbook`
+  and with the streaming `WorkbookWriter`.
+- **A pivot table whose header names or values contain `&`, `<` or `"` no
+  longer comes out corrupt.** The pivot table parts were built from templates
+  that inserted those strings without encoding them, so a single `&` made
+  `pivotCacheDefinition1.xml` and `pivotTable1.xml` malformed XML. They are now
+  encoded.
+
 ## 5.2.2 - 2026-11-10
 
 Drop-in replacement for `exceljs@4.4.0` and for every 5.x release before it.
