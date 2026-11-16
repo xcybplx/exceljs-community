@@ -6,6 +6,7 @@ const {promisify} = require('util');
 const fsReadFileAsync = promisify(fs.readFile);
 
 const JSZip = require('jszip');
+const {SaxesParser} = require('saxes');
 
 const ExcelJS = verquire('exceljs');
 
@@ -56,6 +57,51 @@ describe('Workbook', () => {
           expect(zip.files[filepath]).to.not.be.undefined();
         }
       });
+    });
+
+    it('escapes header names and values that contain XML special characters', async () => {
+      const workbook = new ExcelJS.Workbook();
+
+      const worksheet1 = workbook.addWorksheet('Sheet1');
+      worksheet1.addRows([
+        ['A & B', 'C<D', 'E "F"', 'Note'],
+        ['x < y', 'c "1"', 5, 'Tom & Jerry'],
+        ['x > y', 'c "1"', 7, '<b>'],
+      ]);
+
+      const worksheet2 = workbook.addWorksheet('Sheet2');
+      worksheet2.addPivotTable({
+        sourceSheet: worksheet1,
+        rows: ['A & B'],
+        columns: ['C<D'],
+        values: ['E "F"'],
+        metric: 'sum',
+      });
+
+      const zip = await JSZip.loadAsync(await workbook.xlsx.writeBuffer());
+      const xmlFiles = PIVOT_TABLE_FILEPATHS.filter(f => f.endsWith('1.xml'));
+      const xmls = await Promise.all(
+        xmlFiles.map(f => zip.file(f).async('string'))
+      );
+      const attributes = [];
+      for (const xml of xmls) {
+        const parser = new SaxesParser();
+        parser.on('opentag', node =>
+          attributes.push(...Object.values(node.attributes))
+        );
+        parser.write(xml).close();
+      }
+      expect(attributes).to.include.members([
+        'A & B',
+        'C<D',
+        'E "F"',
+        'x < y',
+        'x > y',
+        'c "1"',
+        'Tom & Jerry',
+        '<b>',
+        'Sum of E "F"',
+      ]);
     });
 
     it('if pivot table NOT added, then certain xml and rels files are not added', () => {
